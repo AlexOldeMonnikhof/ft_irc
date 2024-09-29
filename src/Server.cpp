@@ -1,4 +1,7 @@
 #include "Server.hpp"
+#include "Client.hpp"
+
+class Client;
 
 void    Server::parseServer(string port, string password)
 {
@@ -13,34 +16,41 @@ void    Server::parseServer(string port, string password)
 
 void    Server::initServer()
 {
-    int socketFd, options = 1;
     struct sockaddr_in address;
+    int options = 1;
 
-    socketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socketFd < 0)
+    _socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_socket < 0)
         throw std::runtime_error("Failed to create socket");
-	fcntl(socketFd, F_SETFL, O_NONBLOCK);
-	setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &options, sizeof(int));
+	fcntl(_socket, F_SETFL, O_NONBLOCK);
+	setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &options, sizeof(int));
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(_port);
-	if (bind(socketFd, (struct sockaddr *)&address, sizeof(address)) < 0)
+	if (bind(_socket, (struct sockaddr *)&address, sizeof(address)) < 0)
 		throw std::runtime_error("Failed to bind socket");
-	if (listen(socketFd, SOMAXCONN) < 0)
+	if (listen(_socket, SOMAXCONN) < 0)
 		throw std::runtime_error("Failed to listen on socket");
-	_fds.push_back((pollfd){socketFd, POLLIN, 0});
+	_fds.push_back((pollfd){_socket, POLLIN, 0});
 }
 
 void    Server::addClient()
 {
-
+    int newSocket = accept(_socket, NULL, NULL);
+    if (newSocket < 0)
+        throw std::runtime_error("Failed to accept new client");
+    fcntl(newSocket, F_SETFL, O_NONBLOCK);
+    _fds.push_back((pollfd){newSocket, POLLIN, 0});
+    cout << "ACCEPTED" << endl;
+    _clients[newSocket] = Client(newSocket);
+    cout << _clients[newSocket].getRegister() << endl;
 }
 
 void    Server::mainLoop()
 {
     while (true)
     {
-        poll(_fds.data(), _fds.size(), FOREVER);
+        poll(_fds.data(), _fds.size(), WAIT_FOREVER);
         if (_fds[0].revents == POLLIN)
         {
             addClient();

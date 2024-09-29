@@ -1,10 +1,10 @@
 NAME = ircserv
-SRC = main.cpp Server.cpp
-VPATH = ./src
+SRC = main.cpp Server.cpp Client.cpp
+VPATH = src inc
 FLAGS = -Wall -Wextra -Werror -std=c++98 -I inc
 FLAGS = -std=c++98 -I inc
 CC = c++
-HEADERS = inc/Server.hpp
+HEADERS = Server.hpp Client.hpp
 
 # OBJ = $(SRC:.cpp=.o)
 OBJ_DIR = obj

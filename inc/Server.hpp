@@ -11,18 +11,24 @@
 #include <netinet/in.h>
 #include <vector>
 #include <poll.h>
+#include <map>
 
-#define FOREVER -1
-#define FOREVER -1
+#include "Client.hpp"
+
+#define WAIT_FOREVER -1
 
 using namespace std;
 
+class Client;
+
 class Server{
     private:
-        int             _port;
-        string          _password;
-        string          _host;
-        vector<pollfd>  _fds;
+        int                 _port;
+        int                 _socket;
+        string              _password;
+        string              _host;
+        vector<pollfd>      _fds;
+        map<int, Client>    _clients;
     public:
         Server(string port, string password);
         void    parseServer(string port, string password);
