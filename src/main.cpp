@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 {
     if (argc != 3)
     {
-        cout << "Usage: ./ircsercv \"port\" \"password\"" << endl;
+        cout << "Usage: ./ircsercv port password" << endl;
         return 1;
     }
     try
