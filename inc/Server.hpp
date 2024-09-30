@@ -34,6 +34,9 @@ class Server{
         void    parseServer(string port, string password);
         void    initServer();
         void    addClient();
+        void    disconnectClient(vector<pollfd>::iterator& iter);
+        void    handleMsgClient();
+        void    iterateClientRevents();
         void    mainLoop();
 };
 

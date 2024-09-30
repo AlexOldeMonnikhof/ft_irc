@@ -13,7 +13,10 @@
 #include <poll.h>
 
 #define FOREVER -1
-#include "Server.hpp"
+
+#define NICKNAME 0
+#define USERNAME 1
+#define PASSWORD 2
 
 using namespace std;
 

@@ -43,7 +43,40 @@ void    Server::addClient()
     _fds.push_back((pollfd){newSocket, POLLIN, 0});
     cout << "ACCEPTED" << endl;
     _clients[newSocket] = Client(newSocket);
-    cout << _clients[newSocket].getRegister() << endl;
+}
+
+void    Server::disconnectClient(vector<pollfd>::iterator& iter)
+{
+    cout << "client disconnected. fd = " << iter->fd << endl;
+    _clients.erase(iter->fd);
+    close(iter->fd);
+    iter--;
+    _fds.erase(iter + 1);
+}
+
+void    Server::handleMsgClient()
+{
+    cout << "message send by client" << endl;
+}
+
+void    Server::iterateClientRevents()
+{
+    for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
+    {
+        if (!iter->revents)
+            continue ;
+        if ((iter->revents & POLLHUP) == POLLHUP)
+        {
+            disconnectClient(iter);
+            cout << "iter points to fd " << iter->fd << endl;
+            continue ;
+        }
+        // if ((iter->revents & POLLIN) == POLLIN)
+        // {
+        //     handleMsgClient();
+        //     iter->revents = 0;
+        // }
+    }
 }
 
 void    Server::mainLoop()
@@ -55,6 +88,7 @@ void    Server::mainLoop()
         {
             addClient();
         }
+        iterateClientRevents();
     }
 }
 
