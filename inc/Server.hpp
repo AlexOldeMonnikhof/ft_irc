@@ -17,6 +17,8 @@
 
 #define WAIT_FOREVER -1
 
+#define BUFFER_LENGTH 2048
+
 using namespace std;
 
 class Client;
@@ -35,7 +37,9 @@ class Server{
         void    initServer();
         void    addClient();
         void    disconnectClient(vector<pollfd>::iterator& iter);
-        void    handleMsgClient();
+        string  parseBuffer(string buffer);
+        void    registerClient(string buffer);
+        void    handleMsgClient(int fd);
         void    iterateClientRevents();
         void    mainLoop();
 };

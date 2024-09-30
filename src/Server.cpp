@@ -54,9 +54,49 @@ void    Server::disconnectClient(vector<pollfd>::iterator& iter)
     _fds.erase(iter + 1);
 }
 
-void    Server::handleMsgClient()
+string  Server::parseBuffer(string buffer)
 {
-    cout << "message send by client" << endl;
+    std::string ret;
+	bool inWord = false, column = false;
+
+	for (size_t i = 0; i < buffer.length(); i++)
+	{
+		if (buffer[i] == ' ' && inWord == false)
+			continue;
+		else if (buffer[i] == ':')
+		{
+			column = true;
+			continue;
+		}
+		else if (buffer[i] == ' ' && column == true)
+		{
+			ret += buffer[i];
+			continue;
+		}
+		else if (buffer[i] == ' ')
+			inWord = false;
+		else
+			inWord = true;
+		ret += buffer[i];
+	}
+	return ret;
+}
+
+void    Server::registerClient(string buffer)
+{
+    string str = parseBuffer(buffer);
+}
+
+void    Server::handleMsgClient(int fd)
+{
+    cout << "into msg" << endl;
+    char    buffer[BUFFER_LENGTH];
+    bzero(buffer, BUFFER_LENGTH);
+    ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
+    if (!_clients[fd].getRegister())
+        registerClient(buffer);
+
+    
 }
 
 void    Server::iterateClientRevents()
@@ -64,17 +104,16 @@ void    Server::iterateClientRevents()
     for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
     {
         if (!iter->revents)
-            continue ;
-        if ((iter->revents & POLLHUP) == POLLHUP)
+            continue;
+        if (iter->revents & POLLHUP)
         {
             disconnectClient(iter);
-            cout << "iter points to fd " << iter->fd << endl;
-            continue ;
+            continue;
         }
-        if (((iter->revents & POLLIN) == POLLIN))
+        if (iter->revents & POLLIN)
         {
-            handleMsgClient();
-            iter->revents = 0;
+            handleMsgClient(iter->fd);
+            continue;
         }
     }
 }
