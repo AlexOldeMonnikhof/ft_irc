@@ -27,7 +27,7 @@ void    Server::initServer()
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(_port);
-	if (bind(_socket, (struct sockaddr *)&address, sizeof(address)) < 0)
+	if (::bind(_socket, (struct sockaddr *)&address, sizeof(address)) < 0)
 		throw std::runtime_error("Failed to bind socket");
 	if (listen(_socket, SOMAXCONN) < 0)
 		throw std::runtime_error("Failed to listen on socket");
@@ -71,13 +71,14 @@ void    Server::iterateClientRevents()
             cout << "iter points to fd " << iter->fd << endl;
             continue ;
         }
-        // if ((iter->revents & POLLIN) == POLLIN)
-        // {
-        //     handleMsgClient();
-        //     iter->revents = 0;
-        // }
+        if (((iter->revents & POLLIN) == POLLIN))
+        {
+            handleMsgClient();
+            iter->revents = 0;
+        }
     }
 }
+//iter->revent= begin->rev = 0 && iter-.rev = iter->beg+1
 
 void    Server::mainLoop()
 {
