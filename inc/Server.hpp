@@ -19,6 +19,8 @@
 
 #define BUFFER_LENGTH 2048
 
+#define WHITE_SPACE "\f\n\r\t\v "
+
 using namespace std;
 
 class Client;
@@ -38,8 +40,17 @@ class Server{
         void    addClient();
         void    disconnectClient(vector<pollfd>::iterator& iter);
         string  parseBuffer(string buffer);
-        void    registerClient(string buffer);
+
+
+        //MESSAGES
+        void    msgPASS(int fd, string str);
+        void    msgNICK(string str);
+        void    msgUSER(string str);
+
+
+        void    registerClient(int fd, string buffer);
         void    handleMsgClient(int fd);
+
         void    iterateClientRevents();
         void    mainLoop();
 };
