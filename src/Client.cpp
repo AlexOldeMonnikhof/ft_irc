@@ -20,3 +20,23 @@ void    Client::setRegister(int value)
     if (value == PASSWORD)
         _register = _register | 0b100;
 }
+
+string  Client::getNickname() const
+{
+    return (_nickname);
+}
+
+void    Client::setNickname(string nickname)
+{
+    _nickname = nickname;
+}
+
+string  Client::getUsername() const
+{
+    return (_username);
+}
+
+void    Client::setUsername(string username)
+{
+    _username = username;
+}

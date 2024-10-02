@@ -12,6 +12,7 @@
 #include <vector>
 #include <poll.h>
 #include <map>
+#include <string.h>
 
 #include "Client.hpp"
 
@@ -44,8 +45,8 @@ class Server{
 
         //MESSAGES
         void    msgPASS(int fd, string str);
-        void    msgNICK(string str);
-        void    msgUSER(string str);
+        void    msgNICK(int fd, string str);
+        void    msgUSER(int fd, string str);
 
 
         void    registerClient(int fd, string buffer);

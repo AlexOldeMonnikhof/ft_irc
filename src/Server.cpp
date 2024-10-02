@@ -85,10 +85,13 @@ string  Server::parseBuffer(string buffer)
 void    Server::msgPASS(int fd, string str)
 {
     if (_clients[fd].getRegister() & 0b100)
+    {
         cout << "password already given" << endl;
+        return;
+    }
     str.erase(0, 4); // get rid of PASS
     str.erase(0, str.find_first_not_of(WHITE_SPACE));
-    str.erase(str.find_last_of('\n'), str.size());
+    str.erase(str.size() - 1); // get rid of newline
     if (str == _password)
     {
         _clients[fd].setRegister(PASSWORD);
@@ -96,7 +99,32 @@ void    Server::msgPASS(int fd, string str)
     }
     else
         cout << "incorrect" << endl;    
+    if (_clients[fd].getRegister() == 7)
+        cout << "client is now registered" << endl;
+}
 
+void    Server::msgNICK(int fd, string str)
+{
+    str.erase(0, 4); // get rid of NICK
+    str.erase(0, str.find_first_not_of(WHITE_SPACE));
+    str.erase(str.size() - 1); // get rid of newline
+    _clients[fd].setNickname(str);
+    _clients[fd].setRegister(NICKNAME);
+    cout << "NICK set to " << str << endl;
+    if (_clients[fd].getRegister() == 7)
+        cout << "client is now registered" << endl;
+}
+
+void    Server::msgUSER(int fd, string str)
+{
+    str.erase(0, 4); // get rid of USER
+    str.erase(0, str.find_first_not_of(WHITE_SPACE));
+    str.erase(str.size() - 1); // get rid of newline
+    _clients[fd].setUsername(str);
+    _clients[fd].setRegister(USERNAME);
+    cout << "USER set to " << str << endl;
+    if (_clients[fd].getRegister() == 7)
+        cout << "client is now registered" << endl;
 }
 
 void    Server::registerClient(int fd, string str)
@@ -106,10 +134,10 @@ void    Server::registerClient(int fd, string str)
         msgPASS(fd, str);
     pos = str.find("NICK");
     if (pos != string::npos && pos == 0 && isspace(str[4]))
-        cout << "valid NICK found" << endl;
+        msgNICK(fd, str);
     pos = str.find("USER");
     if (pos != string::npos && pos == 0 && isspace(str[4]))
-        cout << "valid USER found" << endl;
+        msgUSER(fd, str);
 }
 
 void    Server::handleMsgClient(int fd)
@@ -119,7 +147,8 @@ void    Server::handleMsgClient(int fd)
     ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
     if (_clients[fd].getRegister() != 7)
         registerClient(fd, parseBuffer(buffer));
-
+    else
+        cout << "client is already registered" << endl;
     
 }
 

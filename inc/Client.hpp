@@ -30,8 +30,12 @@ class Client{
     public:
         Client(){};
         Client(int socket);
-        int     getRegister() const;
-        void    setRegister(int value);
+        int         getRegister() const;
+        void        setRegister(int value);
+        string      getNickname() const;
+        void        setNickname(string nickname);
+        string      getUsername() const;
+        void        setUsername(string username);
 };
 
 #endif
