@@ -14,7 +14,11 @@
 #include <map>
 #include <string.h>
 
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/poll.h>
 #include "Client.hpp"
+#include "error.hpp"
 
 #define WAIT_FOREVER -1
 
@@ -25,6 +29,23 @@
 using namespace std;
 
 class Client;
+
+class Command{
+    private:
+        vector<string>  cmd;
+    
+    public:
+        Command(){};
+        Command(string str);
+
+        void    parseCmd(string str);
+
+        string  getCmd(int i) const;
+        size_t  getSize() const;
+
+};
+
+//PASS NICK USER
 
 class Server{
     private:
@@ -40,17 +61,21 @@ class Server{
         void    initServer();
         void    addClient();
         void    disconnectClient(vector<pollfd>::iterator& iter);
-        string  parseBuffer(string buffer);
 
 
-        //MESSAGES
-        void    msgPASS(int fd, string str);
-        void    msgNICK(int fd, string str);
-        void    msgUSER(int fd, string str);
+        void    msgPASS(int fd, Command& cmd);
+        bool    isValidNickname(string nick);
+        bool    nickInUse(string nick);
+        void    msgNICK(int fd, Command& cmd);
+        void    msgUSER(int fd, Command& cmd);
 
 
-        void    registerClient(int fd, string buffer);
+        void    errorMsg(int fd, int error, Command& cmd);
+
+        void    registerClient(int fd, Command& cmd);
+        void    cmdsClient(int fd, Command& cmd);
         void    handleMsgClient(int fd);
+        string  parseBuffer(string buffer);
 
         void    iterateClientRevents();
         void    mainLoop();

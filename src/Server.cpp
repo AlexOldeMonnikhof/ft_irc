@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Client.hpp"
+#include "error.hpp"
 
 class Client;
 
@@ -54,90 +55,121 @@ void    Server::disconnectClient(vector<pollfd>::iterator& iter)
     _fds.erase(iter + 1);
 }
 
-string  Server::parseBuffer(string buffer)
+void    Server::errorMsg(int fd, int error, Command& cmd)
 {
-    std::string ret;
-	bool inWord = false, column = false;
+    string client = _clients[fd].getNickname(), msg;
 
-	for (size_t i = 0; i < buffer.length(); i++)
-	{
-		if (buffer[i] == ' ' && inWord == false)
-			continue;
-		else if (buffer[i] == ':')
-		{
-			column = true;
-			continue;
-		}
-		else if (buffer[i] == ' ' && column == true)
-		{
-			ret += buffer[i];
-			continue;
-		}
-		else if (buffer[i] == ' ')
-			inWord = false;
-		else
-			inWord = true;
-		ret += buffer[i];
-	}
-	return ret;
+    if (error == ERR_NONICKNAMEGIVEN) // 431
+        msg = "ERR_NONICKNAMEGIVEN (431)\nError: No nickname given\n";
+    if (error == ERR_ERRONEUSNICKNAME) // 432
+        msg = "ERR_ERRONEUSNICKNAME (432)\n" + cmd.getCmd(1) + ": Erroneus nickname\n";
+    if (error == ERR_NICKNAMEINUSE) // 433
+        msg = "ERR_NICKNAMEINUSE (433)\n" + cmd.getCmd(1) + ": Nickname is already in use\n";
+    if (error == ERR_NOTREGISTERED) // 451
+        msg = "ERR_NOTREGISTERED (451)\nError: You have not registered\n";
+    if (error == ERR_NEEDMOREPARAMS) // 461
+        msg = "ERR_NEEDMOREPARAMS (461)\n" + cmd.getCmd(0) + ": Not enough parameters\n";
+    if (error == ERR_ALREADYREGISTERED) // 462
+        msg = "ERR_ALREADYREGISTERED (462)\nError: You may not reregister\n";
+    if (error == ERR_PASSWDMISMATCH) // 464
+        msg = "ERR_PASSWDMISMATCH (464)\nError: Password incorrect\n";
+    send(fd, msg.c_str(), msg.length(), 0);
 }
 
-void    Server::msgPASS(int fd, string str)
+void    Server::msgPASS(int fd, Command& cmd)
 {
     if (_clients[fd].getRegister() & 0b100)
     {
-        cout << "password already given" << endl;
+        errorMsg(fd, ERR_NOTREGISTERED, cmd);
         return;
     }
-    str.erase(0, 4); // get rid of PASS
-    str.erase(0, str.find_first_not_of(WHITE_SPACE));
-    str.erase(str.size() - 1); // get rid of newline
-    if (str == _password)
+    if (cmd.getSize() < 2)
     {
-        _clients[fd].setRegister(PASSWORD);
-        cout << "pass correct" << endl;
+        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        return;
     }
+    if (cmd.getCmd(1) == _password && cmd.getSize() == 2)
+        _clients[fd].setRegister(PASSWORD);
     else
-        cout << "incorrect" << endl;    
+    {
+        errorMsg(fd, ERR_PASSWDMISMATCH, cmd);
+        return;
+    }
     if (_clients[fd].getRegister() == 7)
         cout << "client is now registered" << endl;
 }
 
-void    Server::msgNICK(int fd, string str)
+
+bool    Server::isValidNickname(string nick)
 {
-    str.erase(0, 4); // get rid of NICK
-    str.erase(0, str.find_first_not_of(WHITE_SPACE));
-    str.erase(str.size() - 1); // get rid of newline
-    _clients[fd].setNickname(str);
+    for (size_t i = 0; i < nick.size(); i++)
+    {
+        char c = nick[i];
+        if (!isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' && c != '\\' && c != '|')
+            return false;
+    }
+    return true;
+}
+
+bool    Server::nickInUse(string nick)
+{
+    for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
+    {
+        if (_clients[iter->fd].getNickname() == nick)
+            return true;
+    }
+    return false;
+}
+
+void    Server::msgNICK(int fd, Command& cmd)
+{
+    if (cmd.getSize() < 2)
+    {
+        errorMsg(fd, ERR_NONICKNAMEGIVEN, cmd);
+        return;
+    }
+    if (!isValidNickname(cmd.getCmd(1)))
+    {
+        errorMsg(fd, ERR_ERRONEUSNICKNAME, cmd);
+        return;
+    }
+    if (nickInUse(cmd.getCmd(1)))
+    {
+        errorMsg(fd, ERR_NICKNAMEINUSE, cmd);
+        return;
+    }
+    _clients[fd].setNickname(cmd.getCmd(1));
     _clients[fd].setRegister(NICKNAME);
-    cout << "NICK set to " << str << endl;
     if (_clients[fd].getRegister() == 7)
         cout << "client is now registered" << endl;
 }
 
-void    Server::msgUSER(int fd, string str)
+// void    Server::msgUSER(int fd, Command& cmd)
+// {
+//     _clients[fd].setUsername(str);
+//     _clients[fd].setRegister(USERNAME);
+//     cout << "USER set to " << str << endl;
+//     if (_clients[fd].getRegister() == 7)
+//         cout << "client is now registered" << endl;
+// }
+
+void    Server::registerClient(int fd, Command& cmd)
 {
-    str.erase(0, 4); // get rid of USER
-    str.erase(0, str.find_first_not_of(WHITE_SPACE));
-    str.erase(str.size() - 1); // get rid of newline
-    _clients[fd].setUsername(str);
-    _clients[fd].setRegister(USERNAME);
-    cout << "USER set to " << str << endl;
-    if (_clients[fd].getRegister() == 7)
-        cout << "client is now registered" << endl;
+    if (cmd.getCmd(0) == "PASS")
+        msgPASS(fd, cmd);
+    if (cmd.getCmd(0) == "NICK")
+        msgNICK(fd, cmd);
+    // if (cmd.getCmd(0) == "USER")
+    //     msgUSER(fd, cmd);
 }
 
-void    Server::registerClient(int fd, string str)
+void    Server::cmdsClient(int fd, Command& cmd)
 {
-    size_t pos = str.find("PASS");
-    if (pos != string::npos && pos == 0 && isspace(str[4]))
-        msgPASS(fd, str);
-    pos = str.find("NICK");
-    if (pos != string::npos && pos == 0 && isspace(str[4]))
-        msgNICK(fd, str);
-    pos = str.find("USER");
-    if (pos != string::npos && pos == 0 && isspace(str[4]))
-        msgUSER(fd, str);
+    if (cmd.getCmd(0) == "PASS" || cmd.getCmd(0) == "NICK" || cmd.getCmd(0) == "USER")
+    {
+        errorMsg(fd, ERR_ALREADYREGISTERED, cmd);
+        return;
+    }
 }
 
 void    Server::handleMsgClient(int fd)
@@ -145,11 +177,11 @@ void    Server::handleMsgClient(int fd)
     char buffer[BUFFER_LENGTH];
     bzero(buffer, BUFFER_LENGTH);
     ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
+    Command cmd(buffer);
     if (_clients[fd].getRegister() != 7)
-        registerClient(fd, parseBuffer(buffer));
+        registerClient(fd, cmd);
     else
-        cout << "client is already registered" << endl;
-    
+        cmdsClient(fd, cmd);
 }
 
 void    Server::iterateClientRevents()
@@ -170,7 +202,6 @@ void    Server::iterateClientRevents()
         }
     }
 }
-//iter->revent= begin->rev = 0 && iter-.rev = iter->beg+1
 
 void    Server::mainLoop()
 {
