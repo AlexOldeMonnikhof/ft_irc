@@ -18,14 +18,14 @@ void  Command::parseCmd(string str)
         {
             if (!word.empty())
             {
-                cmd.push_back(word);
+                _cmd.push_back(word);
                 word.clear();
             }
         }
         else if (str[i] == ':' && !colonFound)
         {
                 colonFound = true;
-                cmd.push_back(word);
+                _cmd.push_back(word);
                 word.clear();
         }
         else
@@ -33,17 +33,17 @@ void  Command::parseCmd(string str)
     }
     word.erase(0, word.find_first_not_of(WHITE_SPACE));
     if (!word.empty())
-        cmd.push_back(word);
+        _cmd.push_back(word);
     // for (size_t i = 0; i < cmd.size(); i++)
         // cout << "cmd " << i << " = " << cmd[i] << endl;
 }
 
 string  Command::getCmd(int i) const
 {
-    return cmd[i];
+    return _cmd[i];
 }
 
 size_t  Command::getSize() const
 {
-    return cmd.size();
+    return _cmd.size();
 }

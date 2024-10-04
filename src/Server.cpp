@@ -4,6 +4,12 @@
 
 class Client;
 
+//UTIL
+void    sendMsg(int fd, string msg)
+{
+    send(fd, msg.c_str(), msg.length(), 0);
+}
+
 void    Server::parseServer(string port, string password)
 {
     stringstream s(port);
@@ -73,7 +79,7 @@ void    Server::errorMsg(int fd, int error, Command& cmd)
         msg = "ERR_ALREADYREGISTERED (462)\n\rError: You may not reregister\n\r";
     if (error == ERR_PASSWDMISMATCH) // 464
         msg = "ERR_PASSWDMISMATCH (464)\n\rError: Password incorrect\n\r";
-    send(fd, msg.c_str(), msg.length(), 0);
+    sendMsg(fd, msg);
 }
 
 void    Server::msgPASS(int fd, Command& cmd)
@@ -174,6 +180,21 @@ void    Server::registerClient(int fd, Command& cmd)
         msgUSER(fd, cmd);
 }
 
+void    Server::cmdJoin(int fd, Command& cmd)
+{
+    string  name = cmd.getCmd(1);
+    if (_channels.find(name) == _channels.end())
+    {
+        cout << _clients[fd].getNickname() << "created channel: " << name << endl;
+        _channels[name] = Channel(fd, name);
+    }
+    else
+    {
+        cout << _clients[fd].getNickname() << "joined channel: " << name << endl;
+        _channels[name].join(fd);
+    }
+}
+
 void    Server::cmdsClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS" || cmd.getCmd(0) == "NICK" || cmd.getCmd(0) == "USER")
@@ -181,6 +202,8 @@ void    Server::cmdsClient(int fd, Command& cmd)
         errorMsg(fd, ERR_ALREADYREGISTERED, cmd);
         return;
     }
+    if (cmd.getCmd(0) == "JOIN")
+        cmdJoin(fd, cmd);
 }
 
 void    Server::handleMsgClient(int fd)
