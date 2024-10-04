@@ -64,8 +64,8 @@ class Server{
 
 
         void    msgPASS(int fd, Command& cmd);
-        bool    isValidNickname(string nick);
-        bool    nickInUse(string nick);
+        bool    isValidName(string nick);
+        bool    nickInUse(int fd, string nick);
         void    msgNICK(int fd, Command& cmd);
         void    msgUSER(int fd, Command& cmd);
 

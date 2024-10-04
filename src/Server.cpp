@@ -60,19 +60,19 @@ void    Server::errorMsg(int fd, int error, Command& cmd)
     string client = _clients[fd].getNickname(), msg;
 
     if (error == ERR_NONICKNAMEGIVEN) // 431
-        msg = "ERR_NONICKNAMEGIVEN (431)\nError: No nickname given\n";
+        msg = "ERR_NONICKNAMEGIVEN (431)\n\rError: No nickname given\n\r";
     if (error == ERR_ERRONEUSNICKNAME) // 432
-        msg = "ERR_ERRONEUSNICKNAME (432)\n" + cmd.getCmd(1) + ": Erroneus nickname\n";
+        msg = "ERR_ERRONEUSNICKNAME (432)\n\r" + cmd.getCmd(1) + ": Erroneus nickname\n\r";
     if (error == ERR_NICKNAMEINUSE) // 433
-        msg = "ERR_NICKNAMEINUSE (433)\n" + cmd.getCmd(1) + ": Nickname is already in use\n";
+        msg = "ERR_NICKNAMEINUSE (433)\n\r" + cmd.getCmd(1) + ": Nickname is already in use\n\r";
     if (error == ERR_NOTREGISTERED) // 451
-        msg = "ERR_NOTREGISTERED (451)\nError: You have not registered\n";
+        msg = "ERR_NOTREGISTERED (451)\n\rError: You have not registered\n\r";
     if (error == ERR_NEEDMOREPARAMS) // 461
-        msg = "ERR_NEEDMOREPARAMS (461)\n" + cmd.getCmd(0) + ": Not enough parameters\n";
+        msg = "ERR_NEEDMOREPARAMS (461)\n\r" + cmd.getCmd(0) + ": Not enough parameters\n\r";
     if (error == ERR_ALREADYREGISTERED) // 462
-        msg = "ERR_ALREADYREGISTERED (462)\nError: You may not reregister\n";
+        msg = "ERR_ALREADYREGISTERED (462)\n\rError: You may not reregister\n\r";
     if (error == ERR_PASSWDMISMATCH) // 464
-        msg = "ERR_PASSWDMISMATCH (464)\nError: Password incorrect\n";
+        msg = "ERR_PASSWDMISMATCH (464)\n\rError: Password incorrect\n\r";
     send(fd, msg.c_str(), msg.length(), 0);
 }
 
@@ -100,21 +100,25 @@ void    Server::msgPASS(int fd, Command& cmd)
 }
 
 
-bool    Server::isValidNickname(string nick)
+bool    Server::isValidName(string nick)
 {
     for (size_t i = 0; i < nick.size(); i++)
     {
         char c = nick[i];
+        if (i == 0 && isdigit(nick[i]))
+            return false;
         if (!isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' && c != '\\' && c != '|')
             return false;
     }
     return true;
 }
 
-bool    Server::nickInUse(string nick)
+bool    Server::nickInUse(int fd, string nick)
 {
     for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
     {
+        if (iter->fd == fd)
+            continue;
         if (_clients[iter->fd].getNickname() == nick)
             return true;
     }
@@ -128,12 +132,12 @@ void    Server::msgNICK(int fd, Command& cmd)
         errorMsg(fd, ERR_NONICKNAMEGIVEN, cmd);
         return;
     }
-    if (!isValidNickname(cmd.getCmd(1)))
+    if (!isValidName(cmd.getCmd(1)))
     {
         errorMsg(fd, ERR_ERRONEUSNICKNAME, cmd);
         return;
     }
-    if (nickInUse(cmd.getCmd(1)))
+    if (nickInUse(fd, cmd.getCmd(1)))
     {
         errorMsg(fd, ERR_NICKNAMEINUSE, cmd);
         return;
@@ -144,14 +148,21 @@ void    Server::msgNICK(int fd, Command& cmd)
         cout << "client is now registered" << endl;
 }
 
-// void    Server::msgUSER(int fd, Command& cmd)
-// {
-//     _clients[fd].setUsername(str);
-//     _clients[fd].setRegister(USERNAME);
-//     cout << "USER set to " << str << endl;
-//     if (_clients[fd].getRegister() == 7)
-//         cout << "client is now registered" << endl;
-// }
+void    Server::msgUSER(int fd, Command& cmd)
+{
+    if (cmd.getSize() < 5)
+    {
+        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        return ;
+    }
+    _clients[fd].setUsername(cmd.getCmd(1));
+    _clients[fd].setHostname(cmd.getCmd(2));
+    _clients[fd].setServername(cmd.getCmd(3));
+    _clients[fd].setRealname(cmd.getCmd(4));
+    _clients[fd].setRegister(USERNAME);
+    if (_clients[fd].getRegister() == 7)
+        cout << "client is now registered" << endl;
+}
 
 void    Server::registerClient(int fd, Command& cmd)
 {
@@ -159,8 +170,8 @@ void    Server::registerClient(int fd, Command& cmd)
         msgPASS(fd, cmd);
     if (cmd.getCmd(0) == "NICK")
         msgNICK(fd, cmd);
-    // if (cmd.getCmd(0) == "USER")
-    //     msgUSER(fd, cmd);
+    if (cmd.getCmd(0) == "USER")
+        msgUSER(fd, cmd);
 }
 
 void    Server::cmdsClient(int fd, Command& cmd)
