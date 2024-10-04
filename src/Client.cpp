@@ -40,3 +40,33 @@ void    Client::setUsername(string username)
 {
     _username = username;
 }
+
+string  Client::getHostname() const
+{
+    return (_hostname);
+}
+
+void    Client::setHostname(string hostname)
+{
+    _hostname = hostname;
+}
+
+string  Client::getServername() const
+{
+    return (_servername);
+}
+
+void    Client::setServername(string servername)
+{
+    _servername = servername;
+}
+
+string  Client::getRealname() const
+{
+    return (_realname);
+}
+
+void    Client::setRealname(string realname)
+{
+    _realname = realname;
+}
