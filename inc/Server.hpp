@@ -26,6 +26,7 @@ class Command{
 
         void    parseCmd(string str);
 
+        void    setCmd(int i, string arg);
         string  getCmd(int i) const;
         size_t  getSize() const;
 };
@@ -54,6 +55,9 @@ class Server{
         bool    nickInUse(int fd, string nick);
         void    msgNICK(int fd, Command& cmd);
         void    msgUSER(int fd, Command& cmd);
+
+        template <typename V>
+        void    parseJoinVectors(V& channels, string str);
 
         void    cmdJoin(int fd, Command& cmd);
 

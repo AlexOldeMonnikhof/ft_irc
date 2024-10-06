@@ -14,5 +14,6 @@
 #include <map>
 #include <poll.h>
 #include <arpa/inet.h>
+#include <cstring>
 
 #endif

@@ -79,6 +79,8 @@ void    Server::errorMsg(int fd, int error, Command& cmd)
         msg = "ERR_ALREADYREGISTERED (462)\n\rError: You may not reregister\n\r";
     if (error == ERR_PASSWDMISMATCH) // 464
         msg = "ERR_PASSWDMISMATCH (464)\n\rError: Password incorrect\n\r";
+    if (error == ERR_BADCHANNELKEY) // 475
+        msg = "ERR_BADCHANNELKEY (475)\n\rError: Incorrect channel key\n\r";
     sendMsg(fd, msg);
 }
 
@@ -101,10 +103,7 @@ void    Server::msgPASS(int fd, Command& cmd)
         errorMsg(fd, ERR_PASSWDMISMATCH, cmd);
         return;
     }
-    if (_clients[fd].getRegister() == 7)
-        cout << "client is now registered" << endl;
 }
-
 
 bool    Server::isValidName(string nick)
 {
@@ -150,8 +149,6 @@ void    Server::msgNICK(int fd, Command& cmd)
     }
     _clients[fd].setNickname(cmd.getCmd(1));
     _clients[fd].setRegister(NICKNAME);
-    if (_clients[fd].getRegister() == 7)
-        cout << "client is now registered" << endl;
 }
 
 void    Server::msgUSER(int fd, Command& cmd)
@@ -166,33 +163,93 @@ void    Server::msgUSER(int fd, Command& cmd)
     _clients[fd].setServername(cmd.getCmd(3));
     _clients[fd].setRealname(cmd.getCmd(4));
     _clients[fd].setRegister(USERNAME);
-    if (_clients[fd].getRegister() == 7)
-        cout << "client is now registered" << endl;
+    cout << "client is now registered" << endl;
 }
 
 void    Server::registerClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS")
         msgPASS(fd, cmd);
+    if (cmd.getCmd(0) == "PASS") // gets rid of notregistered error after password error
+        return;
+    if (!(_clients[fd].getRegister() & 0b100))
+    {
+        errorMsg(fd, ERR_NOTREGISTERED, cmd);
+        return;
+    }
     if (cmd.getCmd(0) == "NICK")
         msgNICK(fd, cmd);
+    if (!(_clients[fd].getRegister() & 0b10))
+    {
+        errorMsg(fd, ERR_NOTREGISTERED, cmd);
+        return;
+    }
     if (cmd.getCmd(0) == "USER")
         msgUSER(fd, cmd);
 }
 
+template <typename V>
+void    Server::parseJoinVectors(V& vector, string str)
+{
+    char *token = strtok((char *)str.c_str(), ",");
+    while (token != nullptr)
+    {
+        vector.push_back(token);
+        token = strtok(nullptr, ",");
+    }
+}
+
+//ERR_NEEDMOREPARAMS (461)
+//ERR_NOSUCHCHANNEL (403)
+//ERR_TOOMANYCHANNELS (405)
+//ERR_BADCHANNELKEY (475)
+//ERR_BANNEDFROMCHAN (474)
+//ERR_CHANNELISFULL (471)
+//ERR_INVITEONLYCHAN (473)
+//ERR_BADCHANMASK (476)
+//RPL_TOPIC (332)
+//RPL_TOPICWHOTIME (333)
+//RPL_NAMREPLY (353)
+//RPL_ENDOFNAMES (366)
+
 void    Server::cmdJoin(int fd, Command& cmd)
 {
-    string  name = cmd.getCmd(1);
-    if (_channels.find(name) == _channels.end())
+    vector<string>  channels;
+    vector<string>  passwords;
+    if (cmd.getSize() < 2)
     {
-        cout << _clients[fd].getNickname() << "created channel: " << name << endl;
-        _channels[name] = Channel(fd, name);
+        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        return;
     }
-    else
+    parseJoinVectors(channels, cmd.getCmd(1));
+    parseJoinVectors(passwords, cmd.getCmd(2));
+    for (size_t i = 0; i < channels.size(); i++)
     {
-        cout << _clients[fd].getNickname() << "joined channel: " << name << endl;
-        _channels[name].join(fd);
+        if (channels[i][0] != '#')
+        {
+            cmd.setCmd(1, channels[i]);
+            errorMsg(fd, ERR_BADCHANMASK, cmd);
+            return;
+        }
+        channels[i].erase(0, 1);
     }
+    for (size_t i = 0; i < channels.size(); i++)
+    {
+        if (_channels.find(channels[i]) != _channels.end())
+        {
+            if (!_channels[channels[i]].getPassword().empty())
+            {
+                if (_channels[channels[i]].getPassword() != passwords[i])
+                {
+                    errorMsg(fd, ERR_BADCHANNELKEY, cmd);
+                    return;
+                }
+            }
+            else
+                _channels[channels[i]] = Channel(fd, channels[i]);
+        }
+    }
+
 }
 
 void    Server::cmdsClient(int fd, Command& cmd)

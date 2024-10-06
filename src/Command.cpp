@@ -43,6 +43,11 @@ string  Command::getCmd(int i) const
     return _cmd[i];
 }
 
+void    Command::setCmd(int i, string arg)
+{
+    _cmd[i] = arg;
+}
+
 size_t  Command::getSize() const
 {
     return _cmd.size();

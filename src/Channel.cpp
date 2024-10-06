@@ -3,6 +3,7 @@
 Channel::Channel(int fd, string name)
 {
     _clients[fd] = true;
+    cout << fd << "created channel " << name << endl;
     setName(name);
 }
 
@@ -22,4 +23,14 @@ string  Channel::getName() const
 void    Channel::setName(string name)
 {
     _name = name;
+}
+
+string  Channel::getPassword() const
+{
+    return _password;
+}
+
+void    Channel::setPassword(string password)
+{
+    _password = password;
 }

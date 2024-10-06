@@ -13,12 +13,12 @@ int Client::getRegister() const
 
 void    Client::setRegister(int value)
 {
-    if (value == NICKNAME)
-        _register = _register | 0b1;
-    if (value == USERNAME)
-        _register = _register | 0b10;
     if (value == PASSWORD)
         _register = _register | 0b100;
+    if (value == NICKNAME)
+        _register = _register | 0b10;
+    if (value == USERNAME)
+        _register = _register | 0b1;
 }
 
 string  Client::getNickname() const
