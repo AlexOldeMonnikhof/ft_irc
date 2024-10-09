@@ -41,7 +41,7 @@ class Server{
         string                  _host;
         vector<pollfd>          _fds;
         map<int, Client>        _clients;
-        map<string, Channel>    _channels;
+        vector<Channel>         _channels;
     public:
         Server(string port, string password);
         void    parseServer(string port, string password);
@@ -56,11 +56,9 @@ class Server{
         void    msgNICK(int fd, Command& cmd);
         void    msgUSER(int fd, Command& cmd);
 
-        template <typename V>
-        void    parseJoinVectors(V& channels, string str);
-
         void    cmdJoin(int fd, Command& cmd);
 
+        void    cmdPart(int fd, Command& cmd);
 
         void    errorMsg(int fd, int error, Command& cmd);
 
@@ -74,5 +72,6 @@ class Server{
 };
 
 void    sendMsg(int fd, string msg);
+vector<string>    splitVector(const string &s, char delimiter);
 
 #endif

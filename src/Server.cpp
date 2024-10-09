@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "error.hpp"
+#include "headers.hpp"
 
 class Client;
 
@@ -48,7 +49,6 @@ void    Server::addClient()
         throw std::runtime_error("Failed to accept new client");
     fcntl(newSocket, F_SETFL, O_NONBLOCK);
     _fds.push_back((pollfd){newSocket, POLLIN, 0});
-    cout << "ACCEPTED" << endl;
     _clients[newSocket] = Client(newSocket);
 }
 
@@ -81,6 +81,8 @@ void    Server::errorMsg(int fd, int error, Command& cmd)
         msg = "ERR_PASSWDMISMATCH (464)\n\rError: Password incorrect\n\r";
     if (error == ERR_BADCHANNELKEY) // 475
         msg = "ERR_BADCHANNELKEY (475)\n\rError: Incorrect channel key\n\r";
+    if (error == ERR_BADCHANMASK) // 476
+        msg = "ERR_BADCHANMASK (476)\n\r" + cmd.getCmd(1) + ": Bad Channel Mask\n\r";
     sendMsg(fd, msg);
 }
 
@@ -170,33 +172,30 @@ void    Server::registerClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS")
         msgPASS(fd, cmd);
-    if (cmd.getCmd(0) == "PASS") // gets rid of notregistered error after password error
-        return;
-    if (!(_clients[fd].getRegister() & 0b100))
+    else if (!(_clients[fd].getRegister() & 0b100))
     {
         errorMsg(fd, ERR_NOTREGISTERED, cmd);
         return;
     }
-    if (cmd.getCmd(0) == "NICK")
+    else if (cmd.getCmd(0) == "NICK")
         msgNICK(fd, cmd);
-    if (!(_clients[fd].getRegister() & 0b10))
+    else if (!(_clients[fd].getRegister() & 0b10))
     {
         errorMsg(fd, ERR_NOTREGISTERED, cmd);
         return;
     }
-    if (cmd.getCmd(0) == "USER")
+    else if (cmd.getCmd(0) == "USER")
         msgUSER(fd, cmd);
 }
 
-template <typename V>
-void    Server::parseJoinVectors(V& vector, string str)
+vector<string> splitVector(const string &s, char delimiter)
 {
-    char *token = strtok((char *)str.c_str(), ",");
-    while (token != nullptr)
-    {
-        vector.push_back(token);
-        token = strtok(nullptr, ",");
-    }
+    vector<string> tokens;
+    stringstream ss(s);
+    string token;
+    while (getline(ss, token, delimiter))
+        tokens.push_back(token);
+    return tokens;
 }
 
 //ERR_NEEDMOREPARAMS (461)
@@ -212,20 +211,32 @@ void    Server::parseJoinVectors(V& vector, string str)
 //RPL_NAMREPLY (353)
 //RPL_ENDOFNAMES (366)
 
+
+size_t getChannelIndex(vector<Channel>& channels, string name)
+{
+    for (size_t i = 0; i < channels.size(); i++)
+    {
+        if (channels[i].getName() == name)
+            return i;
+    }
+    return string::npos;
+}
+
 void    Server::cmdJoin(int fd, Command& cmd)
 {
-    vector<string>  channels;
-    vector<string>  passwords;
+    vector<string>  channels, passwords;
+    size_t j = 0;
     if (cmd.getSize() < 2)
     {
         errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
         return;
     }
-    parseJoinVectors(channels, cmd.getCmd(1));
-    parseJoinVectors(passwords, cmd.getCmd(2));
+    channels = splitVector(cmd.getCmd(1), ',');
+    if (cmd.getSize() == 3)
+        passwords = splitVector(cmd.getCmd(2), ',');
     for (size_t i = 0; i < channels.size(); i++)
     {
-        if (channels[i][0] != '#')
+        if (channels[i][0] != '#' || !channels[i][1])
         {
             cmd.setCmd(1, channels[i]);
             errorMsg(fd, ERR_BADCHANMASK, cmd);
@@ -235,21 +246,57 @@ void    Server::cmdJoin(int fd, Command& cmd)
     }
     for (size_t i = 0; i < channels.size(); i++)
     {
-        if (_channels.find(channels[i]) != _channels.end())
+        size_t index = getChannelIndex(_channels, channels[i]);
+        if (index != string::npos)
         {
-            if (!_channels[channels[i]].getPassword().empty())
+            if (!_channels[index].getPassword().empty())
             {
-                if (_channels[channels[i]].getPassword() != passwords[i])
+                if (passwords.empty() || j >= channels.size() || _channels[index].getPassword() != passwords[j++])
                 {
                     errorMsg(fd, ERR_BADCHANNELKEY, cmd);
-                    return;
+                    continue;
                 }
             }
-            else
-                _channels[channels[i]] = Channel(fd, channels[i]);
+            _channels[index].join(fd, _clients[fd].getUsername());
         }
+        else
+            _channels.push_back(Channel(fd, _clients[fd].getUsername(), channels[i]));
     }
+}
 
+void    Server::cmdPart(int fd, Command& cmd)
+{
+    vector<string>  channels;
+
+    if (cmd.getSize() < 2)
+    {
+        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        return;
+    }
+    channels = splitVector(cmd.getCmd(1), ',');
+    for (size_t i = 0; i < channels.size(); i++)
+    {
+        if (channels[i][0] != '#' || !channels[i][1])
+        {
+            cmd.setCmd(1, channels[i]);
+            errorMsg(fd, ERR_BADCHANMASK, cmd);
+            return;
+        }
+        channels[i].erase(0, 1);
+    }
+    for (size_t i = 0; i < channels.size(); i++)
+    {
+        size_t index = getChannelIndex(_channels, channels[i]);
+        if (index != string::npos)
+        {
+            _channels[index].part(fd, _clients[fd].getUsername());
+            if (_channels[index].getClientsSize() == 0)
+                _channels.erase(_channels.begin() + index);
+        }
+        else
+            cout << "channel " << channels[i] << " does not exist" << endl;
+    }
+    
 }
 
 void    Server::cmdsClient(int fd, Command& cmd)
@@ -261,6 +308,19 @@ void    Server::cmdsClient(int fd, Command& cmd)
     }
     if (cmd.getCmd(0) == "JOIN")
         cmdJoin(fd, cmd);
+    if (cmd.getCmd(0) == "PART")
+        cmdPart(fd, cmd);
+    if (cmd.getCmd(0) == "hello")
+    {
+        cout << "all channels and their clients" << endl;
+        {
+            for (size_t i = 0; i < _channels.size(); i++)
+            {
+                cout << "channel " << _channels[i].getName() << endl;
+                _channels[i].printClients();
+            }
+        }
+    }
 }
 
 void    Server::handleMsgClient(int fd)
@@ -275,35 +335,28 @@ void    Server::handleMsgClient(int fd)
         cmdsClient(fd, cmd);
 }
 
-void    Server::iterateClientRevents()
-{
-    for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
-    {
-        if (!iter->revents)
-            continue;
-        if (iter->revents & POLLHUP)
-        {
-            disconnectClient(iter);
-            continue;
-        }
-        if (iter->revents & POLLIN)
-        {
-            handleMsgClient(iter->fd);
-            continue;
-        }
-    }
-}
-
 void    Server::mainLoop()
 {
     while (true)
     {
         poll(_fds.data(), _fds.size(), WAIT_FOREVER);
         if (_fds[0].revents == POLLIN)
-        {
             addClient();
+        for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
+        {
+            if (!iter->revents)
+                continue;
+            if (iter->revents & POLLHUP)
+            {
+                disconnectClient(iter);
+                continue;
+            }
+            if (iter->revents & POLLIN)
+            {
+                handleMsgClient(iter->fd);
+                continue;
+            }
         }
-        iterateClientRevents();
     }
 }
 
