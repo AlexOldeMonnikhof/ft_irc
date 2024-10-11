@@ -9,15 +9,17 @@ using namespace std;
 
 class Channel{
     private:
-        string          _name;
-        string          _password;
-        map<string, bool>  _clients;
+        string              _name;
+        string              _password;
+        map<string, bool>   _clients;
     public:
         Channel(){};
-        Channel(int fd, string username, string channelName);
+        Channel(int fd, string nick, string channelName);
 
-        void    join(int fd, string username);
-        void    part(int fd, string username);
+        void    join(int fd, string nick);
+        void    part(int fd, string nick);
+
+        bool    clientInChannel(string nick);
 
         string  getName() const;
         void    setName(string name);

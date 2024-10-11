@@ -11,6 +11,26 @@ void    sendMsg(int fd, string msg)
     send(fd, msg.c_str(), msg.length(), 0);
 }
 
+bool    Server::clientExist(string nick)
+{
+    for (map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
+    {
+        if (iter->second.getNickname() == nick)
+            return true;
+    }
+    return false;
+}
+
+bool    Server::channelExist(string channel)
+{
+    for (size_t i = 0; i < _channels.size(); i++)
+    {
+        if (_channels[i].getName() == channel)
+            return true;
+    }
+    return false;
+}
+
 void    Server::parseServer(string port, string password)
 {
     stringstream s(port);
@@ -61,48 +81,23 @@ void    Server::disconnectClient(vector<pollfd>::iterator& iter)
     _fds.erase(iter + 1);
 }
 
-void    Server::errorMsg(int fd, int error, Command& cmd)
-{
-    string client = _clients[fd].getNickname(), msg;
-
-    if (error == ERR_NONICKNAMEGIVEN) // 431
-        msg = "ERR_NONICKNAMEGIVEN (431)\n\rError: No nickname given\n\r";
-    if (error == ERR_ERRONEUSNICKNAME) // 432
-        msg = "ERR_ERRONEUSNICKNAME (432)\n\r" + cmd.getCmd(1) + ": Erroneus nickname\n\r";
-    if (error == ERR_NICKNAMEINUSE) // 433
-        msg = "ERR_NICKNAMEINUSE (433)\n\r" + cmd.getCmd(1) + ": Nickname is already in use\n\r";
-    if (error == ERR_NOTREGISTERED) // 451
-        msg = "ERR_NOTREGISTERED (451)\n\rError: You have not registered\n\r";
-    if (error == ERR_NEEDMOREPARAMS) // 461
-        msg = "ERR_NEEDMOREPARAMS (461)\n\r" + cmd.getCmd(0) + ": Not enough parameters\n\r";
-    if (error == ERR_ALREADYREGISTERED) // 462
-        msg = "ERR_ALREADYREGISTERED (462)\n\rError: You may not reregister\n\r";
-    if (error == ERR_PASSWDMISMATCH) // 464
-        msg = "ERR_PASSWDMISMATCH (464)\n\rError: Password incorrect\n\r";
-    if (error == ERR_BADCHANNELKEY) // 475
-        msg = "ERR_BADCHANNELKEY (475)\n\rError: Incorrect channel key\n\r";
-    if (error == ERR_BADCHANMASK) // 476
-        msg = "ERR_BADCHANMASK (476)\n\r" + cmd.getCmd(1) + ": Bad Channel Mask\n\r";
-    sendMsg(fd, msg);
-}
-
 void    Server::msgPASS(int fd, Command& cmd)
 {
     if (_clients[fd].getRegister() & 0b100)
     {
-        errorMsg(fd, ERR_NOTREGISTERED, cmd);
+        sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
     }
     if (cmd.getSize() < 2)
     {
-        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return;
     }
     if (cmd.getCmd(1) == _password && cmd.getSize() == 2)
         _clients[fd].setRegister(PASSWORD);
     else
     {
-        errorMsg(fd, ERR_PASSWDMISMATCH, cmd);
+        sendMsg(fd, ERR_PASSWDMISMATCH(_clients[fd].getNickname(), _host));
         return;
     }
 }
@@ -132,21 +127,23 @@ bool    Server::nickInUse(int fd, string nick)
     return false;
 }
 
+
+//IMPLEMENT RPL_NICKCHANGE
 void    Server::msgNICK(int fd, Command& cmd)
 {
     if (cmd.getSize() < 2)
     {
-        errorMsg(fd, ERR_NONICKNAMEGIVEN, cmd);
+        sendMsg(fd, ERR_NONICKNAMEGIVEN(_clients[fd].getNickname(), _host));
         return;
     }
     if (!isValidName(cmd.getCmd(1)))
     {
-        errorMsg(fd, ERR_ERRONEUSNICKNAME, cmd);
+        sendMsg(fd, ERR_ERRONEUSNICKNAME(cmd.getCmd(1), _host));
         return;
     }
     if (nickInUse(fd, cmd.getCmd(1)))
     {
-        errorMsg(fd, ERR_NICKNAMEINUSE, cmd);
+        sendMsg(fd, ERR_NICKNAMEINUSE(cmd.getCmd(1), _host));
         return;
     }
     _clients[fd].setNickname(cmd.getCmd(1));
@@ -157,7 +154,7 @@ void    Server::msgUSER(int fd, Command& cmd)
 {
     if (cmd.getSize() < 5)
     {
-        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return ;
     }
     _clients[fd].setUsername(cmd.getCmd(1));
@@ -174,14 +171,14 @@ void    Server::registerClient(int fd, Command& cmd)
         msgPASS(fd, cmd);
     else if (!(_clients[fd].getRegister() & 0b100))
     {
-        errorMsg(fd, ERR_NOTREGISTERED, cmd);
+        sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
     }
     else if (cmd.getCmd(0) == "NICK")
         msgNICK(fd, cmd);
     else if (!(_clients[fd].getRegister() & 0b10))
     {
-        errorMsg(fd, ERR_NOTREGISTERED, cmd);
+        sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
     }
     else if (cmd.getCmd(0) == "USER")
@@ -198,18 +195,13 @@ vector<string> splitVector(const string &s, char delimiter)
     return tokens;
 }
 
-//ERR_NEEDMOREPARAMS (461)
-//ERR_NOSUCHCHANNEL (403)
-//ERR_TOOMANYCHANNELS (405)
-//ERR_BADCHANNELKEY (475)
-//ERR_BANNEDFROMCHAN (474)
-//ERR_CHANNELISFULL (471)
-//ERR_INVITEONLYCHAN (473)
-//ERR_BADCHANMASK (476)
-//RPL_TOPIC (332)
-//RPL_TOPICWHOTIME (333)
-//RPL_NAMREPLY (353)
-//RPL_ENDOFNAMES (366)
+//ERR_NOSUCHCHANNEL (403) ELSEWHERE
+//ERR_CHANNELISFULL (471) LATER
+//ERR_INVITEONLYCHAN (473) LATER
+//RPL_TOPIC (332) LATER
+//RPL_TOPICWHOTIME (333) LATER
+//RPL_NAMREPLY (353) LATER
+//RPL_ENDOFNAMES (366) LATER
 
 
 size_t getChannelIndex(vector<Channel>& channels, string name)
@@ -228,7 +220,7 @@ void    Server::cmdJoin(int fd, Command& cmd)
     size_t j = 0;
     if (cmd.getSize() < 2)
     {
-        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return;
     }
     channels = splitVector(cmd.getCmd(1), ',');
@@ -238,11 +230,9 @@ void    Server::cmdJoin(int fd, Command& cmd)
     {
         if (channels[i][0] != '#' || !channels[i][1])
         {
-            cmd.setCmd(1, channels[i]);
-            errorMsg(fd, ERR_BADCHANMASK, cmd);
+            sendMsg(fd, ERR_BADCHANMASK(_host, channels[i]));
             return;
         }
-        channels[i].erase(0, 1);
     }
     for (size_t i = 0; i < channels.size(); i++)
     {
@@ -253,14 +243,14 @@ void    Server::cmdJoin(int fd, Command& cmd)
             {
                 if (passwords.empty() || j >= channels.size() || _channels[index].getPassword() != passwords[j++])
                 {
-                    errorMsg(fd, ERR_BADCHANNELKEY, cmd);
+                    sendMsg(fd, ERR_BADCHANNELKEY(_clients[fd].getNickname(), _host, channels[i]));
                     continue;
                 }
             }
-            _channels[index].join(fd, _clients[fd].getUsername());
+            _channels[index].join(fd, _clients[fd].getNickname());
         }
         else
-            _channels.push_back(Channel(fd, _clients[fd].getUsername(), channels[i]));
+            _channels.push_back(Channel(fd, _clients[fd].getNickname(), channels[i]));
     }
 }
 
@@ -270,7 +260,7 @@ void    Server::cmdPart(int fd, Command& cmd)
 
     if (cmd.getSize() < 2)
     {
-        errorMsg(fd, ERR_NEEDMOREPARAMS, cmd);
+        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return;
     }
     channels = splitVector(cmd.getCmd(1), ',');
@@ -278,38 +268,88 @@ void    Server::cmdPart(int fd, Command& cmd)
     {
         if (channels[i][0] != '#' || !channels[i][1])
         {
-            cmd.setCmd(1, channels[i]);
-            errorMsg(fd, ERR_BADCHANMASK, cmd);
+            sendMsg(fd, ERR_BADCHANMASK(_host, channels[i]));
             return;
         }
-        channels[i].erase(0, 1);
     }
     for (size_t i = 0; i < channels.size(); i++)
     {
         size_t index = getChannelIndex(_channels, channels[i]);
         if (index != string::npos)
         {
-            _channels[index].part(fd, _clients[fd].getUsername());
+            if (_channels[index].clientInChannel(_clients[fd].getNickname()))
+                _channels[index].part(fd, _clients[fd].getNickname());
+            else
+                sendMsg(fd, ERR_NOTONCHANNEL(_host, channels[i], _clients[fd].getNickname()));
+            _channels[index].part(fd, _clients[fd].getNickname());
             if (_channels[index].getClientsSize() == 0)
                 _channels.erase(_channels.begin() + index);
         }
         else
-            cout << "channel " << channels[i] << " does not exist" << endl;
+            sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channels[i], _clients[fd].getNickname()));
     }
-    
+}
+
+//IMPLEMENT THIS
+void    Server::privmsgChannel(int fd, Command& cmd, string channel)
+{
+    if (!channelExist(channel))
+    {
+        sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channel, _clients[fd].getNickname()));
+        return;
+    }
+    else
+        cout << "sending message to channel " << channel << endl;
+}
+
+void    Server::privmsgClient(int fd, Command& cmd, string nick)
+{
+    if (!clientExist(nick))
+    {
+        sendMsg(fd, ERR_NOSUCHNICK(_host, nick));
+        return;
+    }
+    else
+    {
+        
+    }
+}
+
+// ERR_NOSUCHNICK (401)
+// ERR_CANNOTSENDTOCHAN (404)
+// ERR_NOSUCHCHANNEL (403)
+// ERR_NOTEXTTOSEND (412) DO FOR EMPTY MSG ASWELL
+void    Server::cmdPrivmsg(int fd, Command& cmd)
+{
+    vector<string>  targets;
+    if (cmd.getSize() < 3)
+    {
+        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
+        return;
+    }
+    targets = splitVector(cmd.getCmd(1), ',');
+    for (size_t i = 0; i < targets.size(); i++)
+    {
+        if (targets[i][0] == '#')
+            privmsgChannel(fd, cmd, targets[i]);
+        else
+            privmsgClient(fd, cmd, targets[i]);
+    }
 }
 
 void    Server::cmdsClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS" || cmd.getCmd(0) == "NICK" || cmd.getCmd(0) == "USER")
     {
-        errorMsg(fd, ERR_ALREADYREGISTERED, cmd);
+        sendMsg(fd, ERR_ALREADYREGISTERED(_clients[fd].getNickname(), _host));
         return;
     }
     if (cmd.getCmd(0) == "JOIN")
         cmdJoin(fd, cmd);
     if (cmd.getCmd(0) == "PART")
         cmdPart(fd, cmd);
+    if (cmd.getCmd(0) == "PRIVMSG")
+        cmdPrivmsg(fd, cmd);
     if (cmd.getCmd(0) == "hello")
     {
         cout << "all channels and their clients" << endl;

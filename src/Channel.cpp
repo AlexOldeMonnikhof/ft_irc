@@ -1,27 +1,34 @@
 #include "Channel.hpp"
 
-Channel::Channel(int fd, string username, string channelName)
+Channel::Channel(int fd, string nick, string channelName)
 {
-    _clients[username] = true;
+    _clients[nick] = true;
     cout << fd << " created channel " << channelName << endl;
     setName(channelName);
 }
 
-void    Channel::join(int fd, string username)
+void    Channel::join(int fd, string nick)
 {
-    if (_clients.find(username) != _clients.end())
+    if (_clients.find(nick) != _clients.end())
         sendMsg(fd, "Already in channel\n\r");
     else
     {
-        _clients[username] = false;
-        cout << username << " joined channel " << _name << endl;
+        _clients[nick] = false;
+        cout << nick << " joined channel " << _name << endl;
     }
 }
 
-void    Channel::part(int fd, string username)
+void    Channel::part(int fd, string nick)
 {
-    _clients.erase(username);
-    cout << "Client " << username << " left channel " << _name << endl;
+    _clients.erase(nick);
+    cout << "Client " << nick << " left channel " << _name << endl;
+}
+
+bool    Channel::clientInChannel(string nick)
+{
+    if (_clients.find(nick) != _clients.end())
+        return true;
+    return false;
 }
 
 string  Channel::getName() const

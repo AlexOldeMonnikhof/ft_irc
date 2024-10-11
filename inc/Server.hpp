@@ -57,17 +57,19 @@ class Server{
         void    msgUSER(int fd, Command& cmd);
 
         void    cmdJoin(int fd, Command& cmd);
-
         void    cmdPart(int fd, Command& cmd);
 
-        void    errorMsg(int fd, int error, Command& cmd);
+        void    privmsgChannel(int fd, Command& cmd, string channel);
+        void    privmsgClient(int fd, Command& cmd, string nick);
+        void    cmdPrivmsg(int fd, Command& cmd);
 
         void    registerClient(int fd, Command& cmd);
         void    cmdsClient(int fd, Command& cmd);
         void    handleMsgClient(int fd);
-        string  parseBuffer(string buffer);
 
-        void    iterateClientRevents();
+        bool    clientExist(string user);
+        bool    channelExist(string channel);
+
         void    mainLoop();
 };
 
