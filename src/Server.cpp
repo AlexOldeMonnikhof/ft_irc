@@ -11,16 +11,6 @@ void    sendMsg(int fd, string msg)
     send(fd, msg.c_str(), msg.length(), 0);
 }
 
-bool    Server::clientExist(string nick)
-{
-    for (map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
-    {
-        if (iter->second.getNickname() == nick)
-            return true;
-    }
-    return false;
-}
-
 bool    Server::channelExist(string channel)
 {
     for (size_t i = 0; i < _channels.size(); i++)
@@ -29,6 +19,16 @@ bool    Server::channelExist(string channel)
             return true;
     }
     return false;
+}
+
+int     Server::getClientFd(string nick)
+{
+    for (map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
+    {
+        if (iter->second.getNickname() == nick)
+            return iter->first;
+    }
+    return 0;
 }
 
 void    Server::parseServer(string port, string password)
@@ -299,26 +299,32 @@ void    Server::privmsgChannel(int fd, Command& cmd, string channel)
         return;
     }
     else
-        cout << "sending message to channel " << channel << endl;
+    {
+        size_t index = getChannelIndex(_channels, channel);
+        size_t clientSize = _channels[index].getClientsSize();
+        cout << "size: " << clientSize << endl;
+        vector<string>  clients = _channels[index].getClients();
+        for (size_t i = 0; i < clientSize; i++)
+        {
+            sendMsg(getClientFd(clients[i]), "PRIVMSG " + channel + " :" + cmd.getCmd(2) + "\r\n");
+            cout << "sending message to " << clients[i] << endl;
+        }
+    }
 }
 
 void    Server::privmsgClient(int fd, Command& cmd, string nick)
 {
-    if (!clientExist(nick))
-    {
+    int targetFd = getClientFd(nick);
+    if (!targetFd)
         sendMsg(fd, ERR_NOSUCHNICK(_host, nick));
-        return;
-    }
     else
-    {
-        
-    }
+        sendMsg(targetFd, "PRIVMSG " + nick + " :" + cmd.getCmd(2) + "\r\n"); // CHANGE THIS WITH RIGHT MESSAGE
 }
 
 // ERR_NOSUCHNICK (401)
 // ERR_CANNOTSENDTOCHAN (404)
 // ERR_NOSUCHCHANNEL (403)
-// ERR_NOTEXTTOSEND (412) DO FOR EMPTY MSG ASWELL
+// ERR_NOTEXTTOSEND (412)
 void    Server::cmdPrivmsg(int fd, Command& cmd)
 {
     vector<string>  targets;

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include "Server.hpp"
 
 using namespace std;
@@ -26,6 +27,7 @@ class Channel{
         string  getPassword() const;
         void    setPassword(string password);
         size_t  getClientsSize() const;
+        vector<string>  getClients();
 
         void    printClients();
 };

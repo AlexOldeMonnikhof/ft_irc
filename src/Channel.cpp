@@ -57,6 +57,15 @@ size_t  Channel::getClientsSize() const
     return _clients.size();
 }
 
+vector<string> Channel::getClients()
+{
+    vector<string>  clients;
+
+    for (map<string, bool>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
+        clients.push_back(iter->first);
+    return clients;
+}
+
 void    Channel::printClients()
 {
     for (map<string, bool>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)

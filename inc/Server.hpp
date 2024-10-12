@@ -67,8 +67,8 @@ class Server{
         void    cmdsClient(int fd, Command& cmd);
         void    handleMsgClient(int fd);
 
-        bool    clientExist(string user);
         bool    channelExist(string channel);
+        int     getClientFd(string nick);
 
         void    mainLoop();
 };
