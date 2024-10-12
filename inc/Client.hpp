@@ -1,22 +1,13 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <iostream>
-#include <string>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sstream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <vector>
-#include <poll.h>
-
 #define FOREVER -1
 
 #define NICKNAME 0
 #define USERNAME 1
 #define PASSWORD 2
+
+#include <string>
 
 using namespace std;
 

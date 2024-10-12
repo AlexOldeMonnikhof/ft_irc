@@ -1,23 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <iostream>
-#include <string>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sstream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <vector>
-#include <poll.h>
-#include <map>
-#include <string.h>
-
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/poll.h>
+#include "headers.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 #include "error.hpp"
 
 #define WAIT_FOREVER -1
@@ -29,32 +15,33 @@
 using namespace std;
 
 class Client;
+class Channel;
 
 class Command{
     private:
-        vector<string>  cmd;
-    
+        vector<string>  _cmd;
     public:
         Command(){};
         Command(string str);
 
         void    parseCmd(string str);
 
+        void    setCmd(int i, string arg);
         string  getCmd(int i) const;
         size_t  getSize() const;
-
 };
 
 //PASS NICK USER
 
 class Server{
     private:
-        int                 _port;
-        int                 _socket;
-        string              _password;
-        string              _host;
-        vector<pollfd>      _fds;
-        map<int, Client>    _clients;
+        int                     _port;
+        int                     _socket;
+        string                  _password;
+        string                  _host;
+        vector<pollfd>          _fds;
+        map<int, Client>        _clients;
+        vector<Channel>         _channels;
     public:
         Server(string port, string password);
         void    parseServer(string port, string password);
@@ -69,16 +56,24 @@ class Server{
         void    msgNICK(int fd, Command& cmd);
         void    msgUSER(int fd, Command& cmd);
 
+        void    cmdJoin(int fd, Command& cmd);
+        void    cmdPart(int fd, Command& cmd);
 
-        void    errorMsg(int fd, int error, Command& cmd);
+        void    privmsgChannel(int fd, Command& cmd, string channel);
+        void    privmsgClient(int fd, Command& cmd, string nick);
+        void    cmdPrivmsg(int fd, Command& cmd);
 
         void    registerClient(int fd, Command& cmd);
         void    cmdsClient(int fd, Command& cmd);
         void    handleMsgClient(int fd);
-        string  parseBuffer(string buffer);
 
-        void    iterateClientRevents();
+        bool    channelExist(string channel);
+        int     getClientFd(string nick);
+
         void    mainLoop();
 };
+
+void    sendMsg(int fd, string msg);
+vector<string>    splitVector(const string &s, char delimiter);
 
 #endif
