@@ -50,11 +50,11 @@ class Server{
         void    disconnectClient(vector<pollfd>::iterator& iter);
 
 
-        void    msgPASS(int fd, Command& cmd);
+        void    cmdPASS(int fd, Command& cmd);
         bool    isValidName(string nick);
         bool    nickInUse(int fd, string nick);
-        void    msgNICK(int fd, Command& cmd);
-        void    msgUSER(int fd, Command& cmd);
+        void    cmdNICK(int fd, Command& cmd);
+        void    cmdUSER(int fd, Command& cmd);
 
         void    cmdJoin(int fd, Command& cmd);
         void    cmdPart(int fd, Command& cmd);
@@ -75,5 +75,5 @@ class Server{
 
 void    sendMsg(int fd, string msg);
 vector<string>    splitVector(const string &s, char delimiter);
-
+size_t  getChannelIndex(vector<Channel>& channels, string name);
 #endif

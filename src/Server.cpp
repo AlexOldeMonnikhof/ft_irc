@@ -81,27 +81,6 @@ void    Server::disconnectClient(vector<pollfd>::iterator& iter)
     _fds.erase(iter + 1);
 }
 
-void    Server::msgPASS(int fd, Command& cmd)
-{
-    if (_clients[fd].getRegister() & 0b100)
-    {
-        sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
-        return;
-    }
-    if (cmd.getSize() < 2)
-    {
-        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
-        return;
-    }
-    if (cmd.getCmd(1) == _password && cmd.getSize() == 2)
-        _clients[fd].setRegister(PASSWORD);
-    else
-    {
-        sendMsg(fd, ERR_PASSWDMISMATCH(_clients[fd].getNickname(), _host));
-        return;
-    }
-}
-
 bool    Server::isValidName(string nick)
 {
     for (size_t i = 0; i < nick.size(); i++)
@@ -125,44 +104,6 @@ bool    Server::nickInUse(int fd, string nick)
             return true;
     }
     return false;
-}
-
-
-//IMPLEMENT RPL_NICKCHANGE
-void    Server::msgNICK(int fd, Command& cmd)
-{
-    if (cmd.getSize() < 2)
-    {
-        sendMsg(fd, ERR_NONICKNAMEGIVEN(_clients[fd].getNickname(), _host));
-        return;
-    }
-    if (!isValidName(cmd.getCmd(1)))
-    {
-        sendMsg(fd, ERR_ERRONEUSNICKNAME(cmd.getCmd(1), _host));
-        return;
-    }
-    if (nickInUse(fd, cmd.getCmd(1)))
-    {
-        sendMsg(fd, ERR_NICKNAMEINUSE(cmd.getCmd(1), _host));
-        return;
-    }
-    _clients[fd].setNickname(cmd.getCmd(1));
-    _clients[fd].setRegister(NICKNAME);
-}
-
-void    Server::msgUSER(int fd, Command& cmd)
-{
-    if (cmd.getSize() < 5)
-    {
-        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
-        return ;
-    }
-    _clients[fd].setUsername(cmd.getCmd(1));
-    _clients[fd].setHostname(cmd.getCmd(2));
-    _clients[fd].setServername(cmd.getCmd(3));
-    _clients[fd].setRealname(cmd.getCmd(4));
-    _clients[fd].setRegister(USERNAME);
-    cout << "client is now registered" << endl;
 }
 
 void    Server::registerClient(int fd, Command& cmd)
@@ -204,91 +145,6 @@ vector<string> splitVector(const string &s, char delimiter)
 //RPL_ENDOFNAMES (366) LATER
 
 
-size_t getChannelIndex(vector<Channel>& channels, string name)
-{
-    for (size_t i = 0; i < channels.size(); i++)
-    {
-        if (channels[i].getName() == name)
-            return i;
-    }
-    return string::npos;
-}
-
-void    Server::cmdJoin(int fd, Command& cmd)
-{
-    vector<string>  channels, passwords;
-    size_t j = 0;
-    if (cmd.getSize() < 2)
-    {
-        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
-        return;
-    }
-    channels = splitVector(cmd.getCmd(1), ',');
-    if (cmd.getSize() == 3)
-        passwords = splitVector(cmd.getCmd(2), ',');
-    for (size_t i = 0; i < channels.size(); i++)
-    {
-        if (channels[i][0] != '#' || !channels[i][1])
-        {
-            sendMsg(fd, ERR_BADCHANMASK(_host, channels[i]));
-            return;
-        }
-    }
-    for (size_t i = 0; i < channels.size(); i++)
-    {
-        size_t index = getChannelIndex(_channels, channels[i]);
-        if (index != string::npos)
-        {
-            if (!_channels[index].getPassword().empty())
-            {
-                if (passwords.empty() || j >= channels.size() || _channels[index].getPassword() != passwords[j++])
-                {
-                    sendMsg(fd, ERR_BADCHANNELKEY(_clients[fd].getNickname(), _host, channels[i]));
-                    continue;
-                }
-            }
-            _channels[index].join(fd, _clients[fd].getNickname());
-        }
-        else
-            _channels.push_back(Channel(fd, _clients[fd].getNickname(), channels[i]));
-    }
-}
-
-void    Server::cmdPart(int fd, Command& cmd)
-{
-    vector<string>  channels;
-
-    if (cmd.getSize() < 2)
-    {
-        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
-        return;
-    }
-    channels = splitVector(cmd.getCmd(1), ',');
-    for (size_t i = 0; i < channels.size(); i++)
-    {
-        if (channels[i][0] != '#' || !channels[i][1])
-        {
-            sendMsg(fd, ERR_BADCHANMASK(_host, channels[i]));
-            return;
-        }
-    }
-    for (size_t i = 0; i < channels.size(); i++)
-    {
-        size_t index = getChannelIndex(_channels, channels[i]);
-        if (index != string::npos)
-        {
-            if (_channels[index].clientInChannel(_clients[fd].getNickname()))
-                _channels[index].part(fd, _clients[fd].getNickname());
-            else
-                sendMsg(fd, ERR_NOTONCHANNEL(_host, channels[i], _clients[fd].getNickname()));
-            _channels[index].part(fd, _clients[fd].getNickname());
-            if (_channels[index].getClientsSize() == 0)
-                _channels.erase(_channels.begin() + index);
-        }
-        else
-            sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channels[i], _clients[fd].getNickname()));
-    }
-}
 
 //IMPLEMENT THIS
 void    Server::privmsgChannel(int fd, Command& cmd, string channel)
@@ -319,28 +175,6 @@ void    Server::privmsgClient(int fd, Command& cmd, string nick)
         sendMsg(fd, ERR_NOSUCHNICK(_host, nick));
     else
         sendMsg(targetFd, "PRIVMSG " + nick + " :" + cmd.getCmd(2) + "\r\n"); // CHANGE THIS WITH RIGHT MESSAGE
-}
-
-// ERR_NOSUCHNICK (401)
-// ERR_CANNOTSENDTOCHAN (404)
-// ERR_NOSUCHCHANNEL (403)
-// ERR_NOTEXTTOSEND (412)
-void    Server::cmdPrivmsg(int fd, Command& cmd)
-{
-    vector<string>  targets;
-    if (cmd.getSize() < 3)
-    {
-        sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
-        return;
-    }
-    targets = splitVector(cmd.getCmd(1), ',');
-    for (size_t i = 0; i < targets.size(); i++)
-    {
-        if (targets[i][0] == '#')
-            privmsgChannel(fd, cmd, targets[i]);
-        else
-            privmsgClient(fd, cmd, targets[i]);
-    }
 }
 
 void    Server::cmdsClient(int fd, Command& cmd)
