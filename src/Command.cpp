@@ -9,8 +9,10 @@ void  Command::parseCmd(string str)
 {
     std::string word = "";
     bool colonFound = false;
-
-    for (size_t i = 0; i < str.size(); ++i)
+    _cmd.clear();
+    if (str.find_first_not_of(WHITE_SPACE) == std::string::npos)
+        return;
+    for (size_t i = 0; i < str.size(); i++)
     {
         if (colonFound)
             word += str[i];
@@ -34,8 +36,11 @@ void  Command::parseCmd(string str)
     word.erase(0, word.find_first_not_of(WHITE_SPACE));
     if (!word.empty())
         _cmd.push_back(word);
-    // for (size_t i = 0; i < cmd.size(); i++)
-        // cout << "cmd " << i << " = " << cmd[i] << endl;
+}
+
+vector<string>  Command::getV() const
+{
+    return _cmd;
 }
 
 string  Command::getCmd(int i) const

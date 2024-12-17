@@ -26,6 +26,9 @@ class Command{
 
         void    parseCmd(string str);
 
+        //test
+        vector<string> getV() const;
+
         void    setCmd(int i, string arg);
         string  getCmd(int i) const;
         size_t  getSize() const;
@@ -47,7 +50,7 @@ class Server{
         void    parseServer(string port, string password);
         void    initServer();
         void    addClient();
-        void    disconnectClient(vector<pollfd>::iterator& iter);
+        void    disconnectClient(int fd);
 
 
         void    cmdPASS(int fd, Command& cmd);

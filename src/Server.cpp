@@ -5,30 +5,9 @@
 
 class Client;
 
-//UTIL
 void    sendMsg(int fd, string msg)
 {
     send(fd, msg.c_str(), msg.length(), 0);
-}
-
-bool    Server::channelExist(string channel)
-{
-    for (size_t i = 0; i < _channels.size(); i++)
-    {
-        if (_channels[i].getName() == channel)
-            return true;
-    }
-    return false;
-}
-
-int     Server::getClientFd(string nick)
-{
-    for (map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
-    {
-        if (iter->second.getNickname() == nick)
-            return iter->first;
-    }
-    return 0;
 }
 
 void    Server::parseServer(string port, string password)
@@ -72,58 +51,31 @@ void    Server::addClient()
     _clients[newSocket] = Client(newSocket);
 }
 
-void    Server::disconnectClient(vector<pollfd>::iterator& iter)
+void    Server::disconnectClient(int fd)
 {
-    cout << "client disconnected. fd = " << iter->fd << endl;
-    _clients.erase(iter->fd);
-    close(iter->fd);
-    iter--;
-    _fds.erase(iter + 1);
-}
-
-bool    Server::isValidName(string nick)
-{
-    for (size_t i = 0; i < nick.size(); i++)
-    {
-        char c = nick[i];
-        if (i == 0 && isdigit(nick[i]))
-            return false;
-        if (!isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' && c != '\\' && c != '|')
-            return false;
-    }
-    return true;
-}
-
-bool    Server::nickInUse(int fd, string nick)
-{
-    for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
-    {
-        if (iter->fd == fd)
-            continue;
-        if (_clients[iter->fd].getNickname() == nick)
-            return true;
-    }
-    return false;
+    cout << "client disconnected. fd = " << fd << endl;
+    _clients.erase(fd);
+    close(fd);
 }
 
 void    Server::registerClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS")
-        msgPASS(fd, cmd);
+        cmdPASS(fd, cmd);
     else if (!(_clients[fd].getRegister() & 0b100))
     {
         sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
     }
     else if (cmd.getCmd(0) == "NICK")
-        msgNICK(fd, cmd);
+        cmdNICK(fd, cmd);
     else if (!(_clients[fd].getRegister() & 0b10))
     {
         sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
     }
     else if (cmd.getCmd(0) == "USER")
-        msgUSER(fd, cmd);
+        cmdUSER(fd, cmd);
 }
 
 vector<string> splitVector(const string &s, char delimiter)
@@ -136,53 +88,14 @@ vector<string> splitVector(const string &s, char delimiter)
     return tokens;
 }
 
-//ERR_NOSUCHCHANNEL (403) ELSEWHERE
-//ERR_CHANNELISFULL (471) LATER
-//ERR_INVITEONLYCHAN (473) LATER
-//RPL_TOPIC (332) LATER
-//RPL_TOPICWHOTIME (333) LATER
-//RPL_NAMREPLY (353) LATER
-//RPL_ENDOFNAMES (366) LATER
-
-
-
-//IMPLEMENT THIS
-void    Server::privmsgChannel(int fd, Command& cmd, string channel)
-{
-    if (!channelExist(channel))
-    {
-        sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channel, _clients[fd].getNickname()));
-        return;
-    }
-    else
-    {
-        size_t index = getChannelIndex(_channels, channel);
-        size_t clientSize = _channels[index].getClientsSize();
-        cout << "size: " << clientSize << endl;
-        vector<string>  clients = _channels[index].getClients();
-        for (size_t i = 0; i < clientSize; i++)
-        {
-            sendMsg(getClientFd(clients[i]), "PRIVMSG " + channel + " :" + cmd.getCmd(2) + "\r\n");
-            cout << "sending message to " << clients[i] << endl;
-        }
-    }
-}
-
-void    Server::privmsgClient(int fd, Command& cmd, string nick)
-{
-    int targetFd = getClientFd(nick);
-    if (!targetFd)
-        sendMsg(fd, ERR_NOSUCHNICK(_host, nick));
-    else
-        sendMsg(targetFd, "PRIVMSG " + nick + " :" + cmd.getCmd(2) + "\r\n"); // CHANGE THIS WITH RIGHT MESSAGE
-}
-
 void    Server::cmdsClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS" || cmd.getCmd(0) == "NICK" || cmd.getCmd(0) == "USER")
     {
-        sendMsg(fd, ERR_ALREADYREGISTERED(_clients[fd].getNickname(), _host));
-        return;
+        if (_clients[fd].getRegister() == 7)
+            sendMsg(fd, ERR_ALREADYREGISTERED(_clients[fd].getNickname(), _host));
+        else
+            registerClient(fd, cmd);
     }
     if (cmd.getCmd(0) == "JOIN")
         cmdJoin(fd, cmd);
@@ -208,33 +121,43 @@ void    Server::handleMsgClient(int fd)
     char buffer[BUFFER_LENGTH];
     bzero(buffer, BUFFER_LENGTH);
     ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
+    if (bytesRecv <= 0 || fd == -1)
+    {
+        cout << "client disconnected" << endl;
+        disconnectClient(fd);
+        return ;
+    }
+    cout << "bytes" << bytesRecv << endl;
+    buffer[BUFFER_LENGTH] = '\0';
     Command cmd(buffer);
-    if (_clients[fd].getRegister() != 7)
-        registerClient(fd, cmd);
-    else
-        cmdsClient(fd, cmd);
+    if (cmd.getV().empty())
+    {
+        cout << "empty" << endl;
+        return;
+    }
+    cmdsClient(fd, cmd);
 }
 
 void    Server::mainLoop()
 {
     while (true)
     {
+        //protect
         poll(_fds.data(), _fds.size(), WAIT_FOREVER);
-        if (_fds[0].revents == POLLIN)
-            addClient();
-        for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
+        for (size_t i = 0; i < _fds.size(); i++)
         {
-            if (!iter->revents)
-                continue;
-            if (iter->revents & POLLHUP)
+            if (_fds[i].revents & POLLIN)
             {
-                disconnectClient(iter);
-                continue;
-            }
-            if (iter->revents & POLLIN)
-            {
-                handleMsgClient(iter->fd);
-                continue;
+                if (_fds[i].fd == _socket)
+                {
+                    cout << "adding client" << endl;
+                    addClient();
+                }
+                else
+                {
+                    cout << "handling msg client" << endl;
+                    handleMsgClient(_fds[i].fd);
+                }
             }
         }
     }
