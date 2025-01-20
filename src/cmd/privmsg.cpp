@@ -23,13 +23,9 @@ void    Server::privmsgChannel(int fd, Command& cmd, string channel)
     {
         size_t index = getChannelIndex(_channels, channel);
         size_t clientSize = _channels[index].getClientsSize();
-        cout << "size: " << clientSize << endl;
         vector<string>  clients = _channels[index].getClients();
         for (size_t i = 0; i < clientSize; i++)
-        {
-            sendMsg(getClientFd(clients[i]), "PRIVMSG " + channel + " :" + cmd.getCmd(2) + "\r\n");
-            cout << "sending message to " << clients[i] << endl;
-        }
+            sendMsg(getClientFd(clients[i]), _clients[fd].getNickname() + " (PRIVMSG " + channel + "): " + cmd.getCmd(2) + "\r\n");
     }
 }
 
@@ -42,10 +38,6 @@ void    Server::privmsgClient(int fd, Command& cmd, string nick)
         sendMsg(targetFd, "PRIVMSG " + nick + " :" + cmd.getCmd(2) + "\r\n"); // CHANGE THIS WITH RIGHT MESSAGE
 }
 
-// ERR_NOSUCHNICK (401)
-// ERR_CANNOTSENDTOCHAN (404)
-// ERR_NOSUCHCHANNEL (403)
-// ERR_NOTEXTTOSEND (412)
 void    Server::cmdPrivmsg(int fd, Command& cmd)
 {
     vector<string>  targets;

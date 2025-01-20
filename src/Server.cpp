@@ -53,10 +53,19 @@ void    Server::addClient()
 
 void    Server::disconnectClient(int fd)
 {
-    cout << "client disconnected. fd = " << fd << endl;
+    std::cout << "Client disconnected. fd = " << fd << std::endl;
+    for (std::vector<pollfd>::iterator it = _fds.begin(); it != _fds.end(); ++it)
+    {
+        if (it->fd == fd)
+        {
+            _fds.erase(it);
+            break;
+        }
+    }
     _clients.erase(fd);
     close(fd);
 }
+
 
 void    Server::registerClient(int fd, Command& cmd)
 {
@@ -75,7 +84,16 @@ void    Server::registerClient(int fd, Command& cmd)
         return;
     }
     else if (cmd.getCmd(0) == "USER")
+    {
         cmdUSER(fd, cmd);
+        if (_clients[fd].getRegister() == 7)
+        {
+		    sendMsg(fd, RPL_WELCOME(_clients[fd].getNickname(), _host));
+		    sendMsg(fd, RPL_YOURHOST(_clients[fd].getNickname(), _host));
+		    sendMsg(fd, RPL_CREATED(_clients[fd].getNickname(), _host));
+		    sendMsg(fd, RPL_MYINFO(_clients[fd].getNickname(), _host));
+        }
+    }
 }
 
 vector<string> splitVector(const string &s, char delimiter)
@@ -92,18 +110,24 @@ void    Server::cmdsClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS" || cmd.getCmd(0) == "NICK" || cmd.getCmd(0) == "USER")
     {
-        if (_clients[fd].getRegister() == 7)
-            sendMsg(fd, ERR_ALREADYREGISTERED(_clients[fd].getNickname(), _host));
-        else
+        if (_clients[fd].getRegister() != 7)
             registerClient(fd, cmd);
+        else
+            sendMsg(fd, ERR_ALREADYREGISTERED(_clients[fd].getNickname(), _host));
+        return;
+    }
+    else if (_clients[fd].getRegister() != 7)
+    {
+        sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
+        return;
     }
     if (cmd.getCmd(0) == "JOIN")
         cmdJoin(fd, cmd);
-    if (cmd.getCmd(0) == "PART")
+    else if (cmd.getCmd(0) == "PART")
         cmdPart(fd, cmd);
-    if (cmd.getCmd(0) == "PRIVMSG")
+    else if (cmd.getCmd(0) == "PRIVMSG")
         cmdPrivmsg(fd, cmd);
-    if (cmd.getCmd(0) == "hello")
+    else if (cmd.getCmd(0) == "hello")
     {
         cout << "all channels and their clients" << endl;
         {
@@ -114,6 +138,9 @@ void    Server::cmdsClient(int fd, Command& cmd)
             }
         }
     }
+    else
+        sendMsg(fd, ERR_UNKNOWNCOMMAND(_clients[fd].getNickname(), _host, cmd.getCmd(0)));
+
 }
 
 void    Server::handleMsgClient(int fd)
@@ -121,13 +148,13 @@ void    Server::handleMsgClient(int fd)
     char buffer[BUFFER_LENGTH];
     bzero(buffer, BUFFER_LENGTH);
     ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
+    cout << "br" << bytesRecv << ", fd" << fd << endl;
     if (bytesRecv <= 0 || fd == -1)
     {
-        cout << "client disconnected" << endl;
+        cout << "Client disconnected" << endl;
         disconnectClient(fd);
         return ;
     }
-    cout << "bytes" << bytesRecv << endl;
     buffer[BUFFER_LENGTH] = '\0';
     Command cmd(buffer);
     if (cmd.getV().empty())
@@ -150,14 +177,11 @@ void    Server::mainLoop()
             {
                 if (_fds[i].fd == _socket)
                 {
-                    cout << "adding client" << endl;
+                    cout << "New client connected" << endl;
                     addClient();
                 }
                 else
-                {
-                    cout << "handling msg client" << endl;
                     handleMsgClient(_fds[i].fd);
-                }
             }
         }
     }

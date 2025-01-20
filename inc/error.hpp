@@ -1,10 +1,10 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-// #define RPL_WELCOME(nick, host) ":" + host + " 001 " + nick + " :Welcome " + nick + " to the ft_irc network\r\n"
-// #define RPL_YOURHOST(nick, host) ":" + host + " 002 " + nick + " :Your host is " + host + " running version 1.0\r\n"
-// #define RPL_CREATED(nick, host) ":" + host + " 003 " + nick + " :This server was created 2023-9-15\r\n"
-// #define RPL_MYINFO(nick, host) ":" + host + " 004 " + nick + " :Host: " + host + ", Version: 1.0, User mode: none, Channel modes: o, t, k, i\r\n"
+#define RPL_WELCOME(nick, host) ":" + host + " 001 " + nick + " :Welcome " + nick + " to the ft_irc network\r\n"
+#define RPL_YOURHOST(nick, host) ":" + host + " 002 " + nick + " :Your host is " + host + " running version 1.0\r\n"
+#define RPL_CREATED(nick, host) ":" + host + " 003 " + nick + " :This server was created 2024-08-1\r\n"
+#define RPL_MYINFO(nick, host) ":" + host + " 004 " + nick + " :Host: " + host + ", Version: 1.0, User mode: none, Channel modes: o, t, k, i\r\n"
 
 #define ERR_NOTREGISTERED(nick, host) ":" + host + " 451\r\n" + nick + ": You have not registered\r\n"
 #define ERR_NEEDMOREPARAMS(nick, host) ":" + host + " 461\r\n" + nick + ": Not enough parameters\r\n"
@@ -71,7 +71,7 @@
 // #define RPL_KICK(kicker, username, host, channel, targetuser, reason) "\r\n:" + kicker + "!" + username + "@" + host + " KICK " + channel + " " + targetuser + " :" + reason + "\r\n"
 // #define PRIVMSG_FORMATCH(senderNick, senderUsername, senderhost, receiver, message) ":" + senderNick + "!~" + senderUsername + "@" + senderhost + " PRIVMSG " + receiver + " :" + message + "\r\n"
 // #define PRIVMSG_FORMATUSER(senderNick, receiver, message) ":" + senderNick + " PRIVMSG " + receiver + " :" + message + "\r\n"
-// #define ERR_UNKNOWNCOMMAND(nick, host, command) ":" + host + " 421 " + nick + " " + command + " :Unknown command\r\n"
+#define ERR_UNKNOWNCOMMAND(nick, host, command) ":" + host + " 421 " + nick + " " + command + " :Unknown command\r\n"
 
 // #define ERR_CHANOPRIVSNEEDED(nick, host, channel) ":" + host + " 482 " + nick + " " + channel + " :You're not channel operator\r\n"
 

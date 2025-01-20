@@ -3,7 +3,7 @@
 Channel::Channel(int fd, string nick, string channelName)
 {
     _clients[nick] = true;
-    cout << fd << " created channel " << channelName << endl;
+    cout << nick << " created channel " << channelName << endl;
     setName(channelName);
 }
 

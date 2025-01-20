@@ -12,5 +12,5 @@ void    Server::cmdUSER(int fd, Command& cmd)
     _clients[fd].setServername(cmd.getCmd(3));
     _clients[fd].setRealname(cmd.getCmd(4));
     _clients[fd].setRegister(USERNAME);
-    cout << "client is now registered" << endl;
+    cout << "Client is now registered" << endl;
 }
