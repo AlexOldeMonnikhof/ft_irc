@@ -127,6 +127,8 @@ void    Server::cmdsClient(int fd, Command& cmd)
         cmdPart(fd, cmd);
     else if (cmd.getCmd(0) == "PRIVMSG")
         cmdPrivmsg(fd, cmd);
+    else if (cmd.getCmd(0) == "MODE")
+        cmdMode(fd, cmd);
     else if (cmd.getCmd(0) == "hello")
     {
         cout << "all channels and their clients" << endl;
@@ -139,7 +141,7 @@ void    Server::cmdsClient(int fd, Command& cmd)
         }
     }
     else
-        sendMsg(fd, ERR_UNKNOWNCOMMAND(_clients[fd].getNickname(), _host, cmd.getCmd(0)));
+        sendMsg(fd, ERR_UNKNOWNCOMMAND(_host, _clients[fd].getNickname(), cmd.getCmd(0)));
 
 }
 

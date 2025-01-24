@@ -30,6 +30,7 @@ class Channel{
         vector<string>  getClients();
 
         void    printClients();
+        bool    isOperator(const string nick);
 };
 
 #endif

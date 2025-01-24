@@ -61,6 +61,7 @@ class Server{
 
         void    cmdJoin(int fd, Command& cmd);
         void    cmdPart(int fd, Command& cmd);
+        void    cmdMode(int fd, Command& cmd);
 
         void    privmsgChannel(int fd, Command& cmd, string channel);
         void    privmsgClient(int fd, Command& cmd, string nick);
@@ -72,6 +73,7 @@ class Server{
 
         bool    channelExist(string channel);
         int     getClientFd(string nick);
+
 
         void    mainLoop();
 };

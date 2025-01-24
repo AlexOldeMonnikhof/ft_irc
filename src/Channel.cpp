@@ -71,3 +71,11 @@ void    Channel::printClients()
     for (map<string, bool>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
         cout << iter->first << endl;
 }
+
+bool    Channel::isOperator(const string nick)
+{
+    std::map<std::string, bool>::const_iterator it = _clients.find(nick);
+    if (it != _clients.end())
+        return it->second;
+    return false;
+}

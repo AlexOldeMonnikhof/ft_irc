@@ -71,9 +71,9 @@
 // #define RPL_KICK(kicker, username, host, channel, targetuser, reason) "\r\n:" + kicker + "!" + username + "@" + host + " KICK " + channel + " " + targetuser + " :" + reason + "\r\n"
 // #define PRIVMSG_FORMATCH(senderNick, senderUsername, senderhost, receiver, message) ":" + senderNick + "!~" + senderUsername + "@" + senderhost + " PRIVMSG " + receiver + " :" + message + "\r\n"
 // #define PRIVMSG_FORMATUSER(senderNick, receiver, message) ":" + senderNick + " PRIVMSG " + receiver + " :" + message + "\r\n"
-#define ERR_UNKNOWNCOMMAND(nick, host, command) ":" + host + " 421 " + nick + " " + command + " :Unknown command\r\n"
+#define ERR_UNKNOWNCOMMAND(host, nick, command) ":" + host + " 421 " + nick + " " + command + ": Unknown command\r\n"
 
-// #define ERR_CHANOPRIVSNEEDED(nick, host, channel) ":" + host + " 482 " + nick + " " + channel + " :You're not channel operator\r\n"
+#define ERR_CHANOPRIVSNEEDED(host, nick, channel) ":" + host + " 482 " + nick + " " + channel + ": You're not channel operator\r\n"
 
 // #define RPL_INVITELIST(nick, host, invitedChannel) ":" + host + " 346 " + nick + " " + invitedChannel + " :Invite list\r\n"
 // #define RPL_ENDOFINVITELIST(nick, host) ":" + host + " 347 " + nick + " :End of invite list\r\n"

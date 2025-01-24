@@ -1,7 +1,5 @@
 #include "Server.hpp"
 
-
-
 //ERR_NOSUCHCHANNEL (403) ELSEWHERE
 //ERR_CHANNELISFULL (471) LATER
 //ERR_INVITEONLYCHAN (473) LATER
@@ -25,7 +23,12 @@ void    Server::privmsgChannel(int fd, Command& cmd, string channel)
         size_t clientSize = _channels[index].getClientsSize();
         vector<string>  clients = _channels[index].getClients();
         for (size_t i = 0; i < clientSize; i++)
-            sendMsg(getClientFd(clients[i]), _clients[fd].getNickname() + " (PRIVMSG " + channel + "): " + cmd.getCmd(2) + "\r\n");
+        {
+            string nick = _clients[fd].getNickname();
+            if (_channels[index].isOperator(nick))
+                nick += " -OP-";
+            sendMsg(getClientFd(clients[i]), nick + " (PRIVMSG " + channel + "): " + cmd.getCmd(2) + "\r\n");
+        }
     }
 }
 
