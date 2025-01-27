@@ -24,10 +24,9 @@ void    Server::cmdPart(int fd, Command& cmd)
         if (index != string::npos)
         {
             if (_channels[index].clientInChannel(_clients[fd].getNickname()))
-                _channels[index].part(fd, _clients[fd].getNickname());
+                _channels[index].part(fd, _clients[fd].getNickname(), _host, _clients);
             else
                 sendMsg(fd, ERR_NOTONCHANNEL(_host, channels[i], _clients[fd].getNickname()));
-            _channels[index].part(fd, _clients[fd].getNickname());
             if (_channels[index].getClientsSize() == 0)
                 _channels.erase(_channels.begin() + index);
         }

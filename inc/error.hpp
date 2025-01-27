@@ -17,7 +17,7 @@
 
 
 // #define ERR_CHANNELISFULL(nick, channelName) ":" + nick + " 471 " + channelName + " :Cannot join channel (+l)\r\n"
-// #define ERR_INVITEONLY(nick, channelName) ":" + nick + " 473 " + channelName + " :Cannot join channel (+i)\r\n"
+#define ERR_INVITEONLY(nick, channelName) ":" + nick + " 473 " + channelName + " :Cannot join channel (+i)\r\n"
 #define ERR_BADCHANNELKEY(nick, host, channelName) ":" + host + " 475\r\n" + nick + " " + channelName + ": Cannot join channel (+k)\r\n"
 #define ERR_BADCHANMASK(host, channelName) ":" + host + " 476\r\n" + channelName + ": Bad Channel Mask\r\n"
 
@@ -39,7 +39,7 @@
 // #define RPL_ENDOFNAMES(host, nick, channelname) ":" + host + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
 
 // #define RPL_MODEIS(channel, host, mode) ":" + host + " MODE " + channel + " " + mode + "\r\n"
-// #define RPL_CHANNELMODEIS(channel, host, mode, modeArgs) ":" + host + " MODE " + channel + " " + mode + " " + modeArgs "\r\n"
+#define RPL_CHANNELMODEIS(channel, host, mode, modeArgs) ":" + host + " MODE " + channel + " " + mode + " " + modeArgs "\r\n"
 // #define RPL_MODEISLIMIT(channel, host, mode, newlimit) ":" + host + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
 // #define RPL_MODEISOP(channel, host, mode, target) ":" + host + " MODE " + channel + " " + mode + " " + target + "\r\n"
 // #define ERR_INVALIDMODEPARAM(channel, host, flag) ":" + host + " 696 " + channel + " " + flag + " * you must specifiy a parameter for the op mode\r\n"
@@ -49,12 +49,12 @@
 // #define RPL_CREATIONTIME(host, channelName, nick, time) ":" + host + " 329 " + nick + " " + channelName + " " + time + "\r\n"
 // #define RPL_CHANNELMODES(host, channelName, nick, channelmode) ":" + host + " 324 " + nick + " " + channelName + " " + channelmode + "\r\n"
 
-// #define RPL_INVITING(host, inviting, invited, channel) ":" + host + " 341 " + inviting + " " + invited + " " + channel + " :Inviting " + invited + " to " + channel + "\r\n"
-// #define RPL_INVITE(nick, username, clienthost, invited, channel) ":" + nick + "!" + username + "@" + clienthost + " INVITE " + invited + " :" + channel + "\r\n"
+#define RPL_INVITING(host, inviting, invited, channel) ":" + host + " 341 " + inviting + " " + invited + " " + channel + " :Inviting " + invited + " to " + channel + "\r\n"
+#define RPL_INVITE(nick, username, clienthost, invited, channel) ":" + nick + "!" + username + "@" + clienthost + " INVITE " + invited + " :" + channel + "\r\n"
 #define ERR_NOSUCHNICK(host, nick) ":" + host + " 401\r\n" + nick + ": No such nick/channel\r\n"
 #define ERR_NOSUCHCHANNEL(host, channel, nick) ":" + host + " 403\r\n" + nick + " " + channel + ": No such channel\r\n"
 #define ERR_NOTONCHANNEL(host, channel, nick) ":" + host + " 442\r\n" + nick + " " + channel + ": You're not on that channel\r\n"
-// #define ERR_USERONCHANNEL(host, channel, nick) ":" + host + " 443 " + nick + " " + channel + "  :is already on channel\r\n"
+#define ERR_USERONCHANNEL(host, channel, nick) ":" + host + " 443 " + nick + " " + channel + "  :is already on channel\r\n"
 
 // #define ERR_INPUTTOOLONG(nick, host) ":" + host + " 417 " + nick + " :Input line was too long\r\n"
 
@@ -67,7 +67,7 @@
 // #define RPL_UMODEIS(host, channelname) ":" + host + " MODE " + channelname + " +nt\r\n"
 
 // #define ERR_UNKNOWNMODE(nick, host, channel, character) ":" + host + " 472 " + nick + " " + channel + " " + character + " :is unknown mode char to me\r\n"
-// #define RPL_YOUREOPER(host, nick) ":" + host + " 381 " + nick + ":You are now an IRC operator\r\n"
+#define RPL_YOUREOPER(host, nick) ":" + host + " 381 " + nick + ":You are now an IRC operator\r\n"
 // #define RPL_KICK(kicker, username, host, channel, targetuser, reason) "\r\n:" + kicker + "!" + username + "@" + host + " KICK " + channel + " " + targetuser + " :" + reason + "\r\n"
 // #define PRIVMSG_FORMATCH(senderNick, senderUsername, senderhost, receiver, message) ":" + senderNick + "!~" + senderUsername + "@" + senderhost + " PRIVMSG " + receiver + " :" + message + "\r\n"
 // #define PRIVMSG_FORMATUSER(senderNick, receiver, message) ":" + senderNick + " PRIVMSG " + receiver + " :" + message + "\r\n"

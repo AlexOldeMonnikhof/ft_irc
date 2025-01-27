@@ -63,6 +63,9 @@ class Server{
         void    cmdPart(int fd, Command& cmd);
         void    cmdMode(int fd, Command& cmd);
 
+        void    cmdInvite(int fd, Command& cmd);
+        void    modeInviteOnly(int fd, Channel& channel, bool adding);
+
         void    privmsgChannel(int fd, Command& cmd, string channel);
         void    privmsgClient(int fd, Command& cmd, string nick);
         void    cmdPrivmsg(int fd, Command& cmd);
@@ -77,7 +80,6 @@ class Server{
 
         void    mainLoop();
 };
-
 void    sendMsg(int fd, string msg);
 vector<string>    splitVector(const string &s, char delimiter);
 size_t  getChannelIndex(vector<Channel>& channels, string name);

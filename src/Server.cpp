@@ -129,6 +129,8 @@ void    Server::cmdsClient(int fd, Command& cmd)
         cmdPrivmsg(fd, cmd);
     else if (cmd.getCmd(0) == "MODE")
         cmdMode(fd, cmd);
+    else if (cmd.getCmd(0) == "INVITE")
+        cmdInvite(fd, cmd);
     else if (cmd.getCmd(0) == "hello")
     {
         cout << "all channels and their clients" << endl;
@@ -150,7 +152,6 @@ void    Server::handleMsgClient(int fd)
     char buffer[BUFFER_LENGTH];
     bzero(buffer, BUFFER_LENGTH);
     ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
-    cout << "br" << bytesRecv << ", fd" << fd << endl;
     if (bytesRecv <= 0 || fd == -1)
     {
         cout << "Client disconnected" << endl;

@@ -33,6 +33,11 @@ void    Server::cmdJoin(int fd, Command& cmd)
                     continue;
                 }
             }
+            if (_channels[index].getInviteOnly() && !_channels[index].isUserInvited(_clients[fd].getNickname()))
+            {
+                sendMsg(fd, ERR_INVITEONLY(_clients[fd].getNickname(), channels[i]));
+                continue;
+            }
             _channels[index].join(fd, _clients[fd].getNickname());
         }
         else

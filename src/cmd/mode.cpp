@@ -22,29 +22,19 @@ void Server::cmdMode(int fd, Command& cmd)
     }
     bool adding = false;
     string mode = cmd.getCmd(2);
-    if (mode.size() != 2)
-    {
-        cout << "invalid mode before plusmin: " << mode << endl;
-        return ; 
-    }
     if (mode[0] == '+')
-    {
         adding = true;
-    }
     else if (mode[0] == '-')
-    {
         adding = false;
-    }
     else
     {
         cout << "invalid mode: " << mode << endl;
         return ;
     }
-    cout << "nice tar: " << mode << endl;
     // if (target[1] == 'o')
     //     modeOperator(_channels[index], adding, cmd);
-    // else if (target[1] == 'i')
-    //     modeInviteOnly(_channels[index], adding);
+    if (mode[1] == 'i')
+        modeInviteOnly(fd, _channels[i], adding);
     // else if (target[1] == 'k')
     //     modeKey(_channels[index], adding, cmd);
     // else if (target[1] == 't')

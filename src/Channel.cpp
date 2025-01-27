@@ -3,6 +3,8 @@
 Channel::Channel(int fd, string nick, string channelName)
 {
     _clients[nick] = true;
+    _userlimit = 0;
+    _inviteOnly = false;
     cout << nick << " created channel " << channelName << endl;
     setName(channelName);
 }
@@ -18,10 +20,16 @@ void    Channel::join(int fd, string nick)
     }
 }
 
-void    Channel::part(int fd, string nick)
+void    Channel::part(int fd, string nick, string _host, map<int, Client>& clientsFds)
 {
+    bool wasOp = isOperator(nick);
     _clients.erase(nick);
-    cout << "Client " << nick << " left channel " << _name << endl;
+    if (wasOp && !_clients.empty())
+    {
+        _clients.begin()->second = true;
+        sendMsg(clientsFds.begin()->first, RPL_YOUREOPER(_host, _clients.begin()->first));
+    }
+    cout << nick << " left channel " << _name << endl;
 }
 
 bool    Channel::clientInChannel(string nick)
@@ -66,10 +74,50 @@ vector<string> Channel::getClients()
     return clients;
 }
 
+void    Channel::setUsersLimit(int limit)
+{
+    _userlimit = limit;
+}
+
+int     Channel::getUsersLimit() const
+{
+    return _userlimit;
+}
+
+bool    Channel::getInviteOnly() const
+{
+    return _inviteOnly;
+}
+
+void    Channel::setInviteOnly(bool inviteOnly)
+{
+    _inviteOnly = inviteOnly;
+}
+
 void    Channel::printClients()
 {
     for (map<string, bool>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
         cout << iter->first << endl;
+}
+
+void    Channel::inviteUser(string nick)
+{
+    _inviteList.push_back(nick);
+}
+
+void    Channel::setOperator(string nick)
+{
+    _clients[nick] = true;
+}
+
+bool    Channel::isUserInvited(string nick) const
+{
+    for (size_t i = 0; i < _inviteList.size(); i++)
+    {
+        if (_inviteList[i] == nick)
+            return true;
+    }
+    return false;
 }
 
 bool    Channel::isOperator(const string nick)
