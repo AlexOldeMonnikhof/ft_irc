@@ -5,7 +5,7 @@ Channel::Channel(int fd, string nick, string channelName)
     _clients[nick] = true;
     _userlimit = 0;
     _inviteOnly = false;
-    cout << nick << " created channel " << channelName << endl;
+    cout << nick << " (fd=" << fd <<") created channel " << channelName << endl;
     setName(channelName);
 }
 
@@ -29,7 +29,7 @@ void    Channel::part(int fd, string nick, string _host, map<int, Client>& clien
         _clients.begin()->second = true;
         sendMsg(clientsFds.begin()->first, RPL_YOUREOPER(_host, _clients.begin()->first));
     }
-    cout << nick << " left channel " << _name << endl;
+    cout << nick << " (fd=" << fd <<") left channel " << _name << endl;
 }
 
 bool    Channel::clientInChannel(string nick)

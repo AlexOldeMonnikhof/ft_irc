@@ -73,6 +73,7 @@ class Server{
         void    registerClient(int fd, Command& cmd);
         void    cmdsClient(int fd, Command& cmd);
         void    handleMsgClient(int fd);
+        void    handleHexChatRegister(int fd, string buffer);
 
         bool    channelExist(string channel);
         int     getClientFd(string nick);

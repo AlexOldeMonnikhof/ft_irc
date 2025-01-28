@@ -28,7 +28,9 @@ void    Server::initServer()
 
     _socket = socket(AF_INET, SOCK_STREAM, 0);
     if (_socket < 0)
+    {
         throw std::runtime_error("Failed to create socket");
+    }
 	fcntl(_socket, F_SETFL, O_NONBLOCK);
 	setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &options, sizeof(int));
 	address.sin_family = AF_INET;
@@ -147,6 +149,48 @@ void    Server::cmdsClient(int fd, Command& cmd)
 
 }
 
+bool    checkIfHexChat(string str)
+{
+    if (str.find("CAP") != string::npos)
+        return true;
+    return false;
+}
+
+void    Server::handleHexChatRegister(int fd, string buffer)
+{
+        string buff = buffer;
+        std::size_t pos;
+        std::size_t endpos;
+
+        pos = buff.find("PASS");
+        if (pos == string::npos)
+            return;
+        endpos = buff.find("\r\n", pos);
+        string pass = buff.substr(pos, endpos - pos);
+        Command Pass(pass);
+        cmdPASS(fd, Pass);
+
+
+        buff = buffer;
+        pos = buff.find("NICK");
+        if (pos == string::npos)
+            return;
+        endpos = buff.find("\r\n", pos);
+        string nick = buff.substr(pos, endpos - pos);
+        Command Nick(nick);
+        cmdNICK(fd, Nick);
+
+        buff = buffer;
+        pos = buff.find("USER");
+        if (pos == string::npos)
+            return;
+        endpos = buff.find("\r\n", pos);
+        string user = buff.substr(pos);
+        Command User(user);
+        cmdUSER(fd, User);
+
+}
+
 void    Server::handleMsgClient(int fd)
 {
     char buffer[BUFFER_LENGTH];
@@ -154,11 +198,16 @@ void    Server::handleMsgClient(int fd)
     ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
     if (bytesRecv <= 0 || fd == -1)
     {
-        cout << "Client disconnected" << endl;
         disconnectClient(fd);
         return ;
     }
     buffer[BUFFER_LENGTH] = '\0';
+    if (checkIfHexChat(buffer))
+    {
+        handleHexChatRegister(fd, buffer);
+        return;
+    }
+    cout << buffer << endl;
     Command cmd(buffer);
     if (cmd.getV().empty())
     {

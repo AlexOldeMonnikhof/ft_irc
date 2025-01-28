@@ -27,7 +27,7 @@ bool    Server::isValidName(string nick)
         char c = nick[i];
         if (i == 0 && isdigit(nick[i]))
             return false;
-        if (!isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' && c != '\\' && c != '|')
+        if (!isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' && c != '\\' && c != '|' && c != '-')
             return false;
     }
     return true;
