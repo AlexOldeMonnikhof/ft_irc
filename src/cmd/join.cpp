@@ -43,6 +43,7 @@ void    Server::cmdJoin(int fd, Command& cmd)
                 sendMsg(fd, ERR_CHANNELISFULL(_clients[fd].getNickname(), channels[i]));
                 continue;
             }
+            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i]);
             _channels[index].join(fd, _clients[fd].getNickname());
         }
         else

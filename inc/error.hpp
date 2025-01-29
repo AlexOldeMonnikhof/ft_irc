@@ -31,13 +31,14 @@
 // #define RPL_TOPICTIME(nick, host, channel, nickSeter, time) ":" + host + " 333 " + nick + " " + channel + " " + nickSeter + " " + time + "\r\n"
 
 
-// #define RPL_JOIN(nick, username, channelname, ipaddress) ":" + nick + "!~" + username + "@" + ipaddress + " JOIN " + channelname + "\r\n"
+#define RPL_JOIN(nick, username, channelname, ipaddress) ":" + nick + "!~" + username + "@" + ipaddress + " JOIN " + channelname + "\r\n"
 // #define RPL_PART(host, nick, username, channel, reason) ":"+nick+"!"+username+ "@" + host +" PART "  + channel+" "+reason+ "\r\n"
 // #define RPL_QUIT(host, nick, username, reason) ":"+nick+"!"+username+ "@" + host +" QUIT :"+reason+ "\r\n"
 
 // #define RPL_NAMREPLY(host, clients, channelname, nick) ":" + host + " 353 " + nick + " = " + channelname + " :" + clients + "\r\n"
 // #define RPL_ENDOFNAMES(host, nick, channelname) ":" + host + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
 
+#define RPL_MODEIS(channel, hostname, mode) ":" + hostname + " MODE " + channel + " " + mode + "\r\n"
 #define RPL_CHANNELMODEIS(channel, host, mode, modeArgs) ":" + host + " MODE " + channel + " " + mode + " " + modeArgs "\r\n"
 #define RPL_MODEISLIMIT(channel, host, mode, newlimit) ":" + host + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
 #define RPL_MODEISOP(channel, host, mode, target) ":" + host + " MODE " + channel + " " + mode + " " + target + "\r\n"
@@ -67,7 +68,7 @@
 
 // #define ERR_UNKNOWNMODE(nick, host, channel, character) ":" + host + " 472 " + nick + " " + channel + " " + character + " :is unknown mode char to me\r\n"
 #define RPL_YOUREOPER(host, nick) ":" + host + " 381 " + nick + ":You are now an IRC operator\r\n"
-// #define RPL_KICK(kicker, username, host, channel, targetuser, reason) "\r\n:" + kicker + "!" + username + "@" + host + " KICK " + channel + " " + targetuser + " :" + reason + "\r\n"
+#define RPL_KICK(kicker, username, host, channel, targetuser) ":" + kicker + "!" + username + "@" + host + " KICK " + channel + " " + targetuser + "\r\n"
 // #define PRIVMSG_FORMATCH(senderNick, senderUsername, senderhost, receiver, message) ":" + senderNick + "!~" + senderUsername + "@" + senderhost + " PRIVMSG " + receiver + " :" + message + "\r\n"
 // #define PRIVMSG_FORMATUSER(senderNick, receiver, message) ":" + senderNick + " PRIVMSG " + receiver + " :" + message + "\r\n"
 #define ERR_UNKNOWNCOMMAND(host, nick, command) ":" + host + " 421 " + nick + " " + command + ": Unknown command\r\n"

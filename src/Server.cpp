@@ -135,17 +135,8 @@ void    Server::cmdsClient(int fd, Command& cmd)
         cmdInvite(fd, cmd);
     else if (cmd.getCmd(0) == "TOPIC")
         cmdTopic(fd, cmd);
-    else if (cmd.getCmd(0) == "hello")
-    {
-        cout << "all channels and their clients" << endl;
-        {
-            for (size_t i = 0; i < _channels.size(); i++)
-            {
-                cout << "channel " << _channels[i].getName() << endl;
-                _channels[i].printClients();
-            }
-        }
-    }
+    else if (cmd.getCmd(0) == "KICK")
+        cmdKick(fd, cmd);
     else
         sendMsg(fd, ERR_UNKNOWNCOMMAND(_host, _clients[fd].getNickname(), cmd.getCmd(0)));
 

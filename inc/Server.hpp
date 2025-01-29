@@ -61,6 +61,7 @@ class Server{
         void    cmdJoin(int fd, Command& cmd);
         void    cmdPart(int fd, Command& cmd);
         void    cmdMode(int fd, Command& cmd);
+        void    cmdKick(int fd, Command& cmd);
 
         void    cmdInvite(int fd, Command& cmd);
         void    modeInviteOnly(int fd, Channel& channel, bool adding);
@@ -69,6 +70,8 @@ class Server{
         void    modeTopic(int fd, Channel& channel, bool adding);
 
         void    modeUserLimit(int fd, Channel& channel, bool adding, Command& cmd);
+
+        void    modeKey(int fd, Channel& channel, bool adding, Command& cmd);
 
         void    modeOperator(int fd, Channel& channel, bool adding, Command& cmd);
 

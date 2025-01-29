@@ -15,6 +15,11 @@ void Server::cmdMode(int fd, Command& cmd)
         return;
     }
     size_t i = getChannelIndex(_channels, channel);
+	if (!_channels[i].clientInChannel(_clients[fd].getNickname()))
+	{
+		sendMsg(fd, ERR_NOTONCHANNEL(_host, _channels[i].getName(), _clients[fd].getNickname()));
+		return;
+	}
     if (!_channels[i].isOperator(_clients[fd].getNickname()))
     {
         sendMsg(fd, ERR_CHANOPRIVSNEEDED(_host, _clients[fd].getNickname(), channel));
@@ -38,8 +43,8 @@ void Server::cmdMode(int fd, Command& cmd)
             modeInviteOnly(fd, _channels[i], adding);
         else if (mode[j] == 'o')
             modeOperator(fd, _channels[i], adding, cmd);
-        // else if (mode[j] == 'k')
-        //     modeKey(_channels[index], adding, cmd);
+        else if (mode[j] == 'k')
+            modeKey(fd, _channels[i], adding, cmd);
         else if (mode[j] == 't')
             modeTopic(fd, _channels[i], adding);
         else if (mode[j] == 'l')
