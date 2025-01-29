@@ -66,9 +66,13 @@ class Server{
         void    cmdInvite(int fd, Command& cmd);
         void    modeInviteOnly(int fd, Channel& channel, bool adding);
 
+        void    cmdTopic(int fd, Command& cmd);
+        void    modeTopic(int fd, Channel& channel, bool adding);
+
         void    privmsgChannel(int fd, Command& cmd, string channel);
         void    privmsgClient(int fd, Command& cmd, string nick);
         void    cmdPrivmsg(int fd, Command& cmd);
+        void    msgChannel(int fd, string msg, string channel);
 
         void    registerClient(int fd, Command& cmd);
         void    cmdsClient(int fd, Command& cmd);
@@ -77,7 +81,6 @@ class Server{
 
         bool    channelExist(string channel);
         int     getClientFd(string nick);
-
 
         void    mainLoop();
 };

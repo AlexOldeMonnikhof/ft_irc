@@ -133,6 +133,8 @@ void    Server::cmdsClient(int fd, Command& cmd)
         cmdMode(fd, cmd);
     else if (cmd.getCmd(0) == "INVITE")
         cmdInvite(fd, cmd);
+    else if (cmd.getCmd(0) == "TOPIC")
+        cmdTopic(fd, cmd);
     else if (cmd.getCmd(0) == "hello")
     {
         cout << "all channels and their clients" << endl;
@@ -158,74 +160,82 @@ bool    checkIfHexChat(string str)
 
 void    Server::handleHexChatRegister(int fd, string buffer)
 {
-        string buff = buffer;
-        std::size_t pos;
-        std::size_t endpos;
-
-        pos = buff.find("PASS");
-        if (pos == string::npos)
-            return;
-        endpos = buff.find("\r\n", pos);
-        string pass = buff.substr(pos, endpos - pos);
-        Command Pass(pass);
-        cmdPASS(fd, Pass);
-
-
-        buff = buffer;
-        pos = buff.find("NICK");
-        if (pos == string::npos)
-            return;
-        endpos = buff.find("\r\n", pos);
-        string nick = buff.substr(pos, endpos - pos);
-        Command Nick(nick);
-        cmdNICK(fd, Nick);
-
-        buff = buffer;
-        pos = buff.find("USER");
-        if (pos == string::npos)
-            return;
-        endpos = buff.find("\r\n", pos);
-        string user = buff.substr(pos);
-        Command User(user);
-        cmdUSER(fd, User);
-
+    cout << "HexChat register" << endl;
+    string buff = buffer;
+    std::size_t pos;
+    std::size_t endpos;
+    pos = buff.find("PASS");
+    if (pos == string::npos)
+        return;
+    endpos = buff.find("\r\n", pos);
+    string pass = buff.substr(pos, endpos - pos);
+    Command Pass(pass);
+    cmdPASS(fd, Pass);
+    buff = buffer;
+    pos = buff.find("NICK");
+    if (pos == string::npos)
+        return;
+    endpos = buff.find("\r\n", pos);
+    string nick = buff.substr(pos, endpos - pos);
+    Command Nick(nick);
+    cmdNICK(fd, Nick);
+    buff = buffer;
+    pos = buff.find("USER");
+    if (pos == string::npos)
+        return;
+    endpos = buff.find("\r\n", pos);
+    string user = buff.substr(pos);
+    Command User(user);
+    cmdUSER(fd, User);
+    if (_clients[fd].getRegister() == 7)
+    {
+        sendMsg(fd, RPL_WELCOME(_clients[fd].getNickname(), _host));
+        sendMsg(fd, RPL_YOURHOST(_clients[fd].getNickname(), _host));
+        sendMsg(fd, RPL_CREATED(_clients[fd].getNickname(), _host));
+        sendMsg(fd, RPL_MYINFO(_clients[fd].getNickname(), _host));
+    }
 }
 
-void    Server::handleMsgClient(int fd)
+void Server::handleMsgClient(int fd)
 {
-    char buffer[BUFFER_LENGTH];
-    bzero(buffer, BUFFER_LENGTH);
-    ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH - 1, 0);
-    if (bytesRecv <= 0 || fd == -1)
+    static std::map<int, std::string> partial;
+    size_t pos;
+    char buffer[BUFFER_LENGTH + 1];
+    memset(buffer, 0, sizeof(buffer));
+    ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH, 0);
+    if (bytesRecv <= 0)
     {
+        partial.erase(fd);
         disconnectClient(fd);
-        return ;
-    }
-    buffer[BUFFER_LENGTH] = '\0';
-    if (checkIfHexChat(buffer))
-    {
-        handleHexChatRegister(fd, buffer);
         return;
     }
-    cout << buffer << endl;
-    Command cmd(buffer);
-    if (cmd.getV().empty())
+    partial[fd].append(buffer, bytesRecv);
+    while ((pos = partial[fd].find('\n')) != std::string::npos)
     {
-        cout << "empty" << endl;
-        return;
+        std::string line = partial[fd].substr(0, pos + 1);
+        partial[fd].erase(0, pos + 1);
+        if (checkIfHexChat(line))
+            handleHexChatRegister(fd, line);
+        else
+        {
+            Command cmd(line);
+            if (!cmd.getV().empty())
+                cmdsClient(fd, cmd);
+        }
     }
-    cmdsClient(fd, cmd);
 }
 
 void    Server::mainLoop()
 {
     while (true)
     {
-        //protect
-        poll(_fds.data(), _fds.size(), WAIT_FOREVER);
+        if (poll(_fds.begin().base(), _fds.size(), WAIT_FOREVER) < 0)
+            throw std::runtime_error("Error: poll failed");
         for (size_t i = 0; i < _fds.size(); i++)
         {
-            if (_fds[i].revents & POLLIN)
+            if (_fds[i].revents == 0)
+                continue;
+            if ((_fds[i].revents & POLLIN) == POLLIN)
             {
                 if (_fds[i].fd == _socket)
                 {

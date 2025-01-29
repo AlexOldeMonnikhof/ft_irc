@@ -45,12 +45,13 @@ void    Server::cmdInvite(int fd, Command& cmd)
 
 void Server::modeInviteOnly(int fd, Channel& channel, bool adding)
 {
+    if (!channel.isOperator(_clients[fd].getNickname()))
+    {
+        sendMsg(fd, ERR_CHANOPRIVSNEEDED(_host, _clients[fd].getNickname(), channel.getName()));
+        return;
+    }
     channel.setInviteOnly(adding);
-    string mode;
-    if (adding)
-        mode = "+i";
-    else
-        mode = "-i";
+    string mode = (adding ? "+t" : "-t");
     sendMsg(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""));
     if (adding)
         cout << "channel " << channel.getName() << " is now invite only: " << endl;

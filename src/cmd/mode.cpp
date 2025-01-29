@@ -31,14 +31,18 @@ void Server::cmdMode(int fd, Command& cmd)
         cout << "invalid mode: " << mode << endl;
         return ;
     }
-    // if (target[1] == 'o')
-    //     modeOperator(_channels[index], adding, cmd);
-    if (mode[1] == 'i')
-        modeInviteOnly(fd, _channels[i], adding);
-    // else if (target[1] == 'k')
-    //     modeKey(_channels[index], adding, cmd);
-    // else if (target[1] == 't')
-    //     modeTopic(_channels[index], adding);
-    // else if (target[1] == 'l')
-    //     modeLimit(_channels[index], adding, cmd);
+    size_t j = 0;
+    while (mode[++j])
+    {
+        if (mode[j] == 'i')
+            modeInviteOnly(fd, _channels[i], adding);
+        // else if (mode[j] == 'o')
+        //     modeOperator(_channels[index], adding, cmd);
+        // else if (mode[j] == 'k')
+        //     modeKey(_channels[index], adding, cmd);
+        else if (mode[j] == 't')
+            modeTopic(fd, _channels[i], adding);
+        // else if (mode[j] == 'l')
+        //     modeLimit(_channels[index], adding, cmd);
+    }
 }

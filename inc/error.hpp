@@ -27,7 +27,7 @@
 // // S <-   :irc.example.com 333 dan #v4 dan 1547858123
 
 // #define RPL_NOTOPIC(nick, host, channel) ":" + host + " 331 " + nick + " " + channel + " :No topic is set\r\n"
-// #define RPL_TOPIC(nick, host, channel, topic) ":" + host + " 332 " + nick + " " + channel + " :" + topic + "\r\n"
+#define RPL_TOPIC(nick, host, channel, topic) ":" + host + " 332 " + nick + " " + channel + " :" + topic + "\r\n"
 // #define RPL_TOPICTIME(nick, host, channel, nickSeter, time) ":" + host + " 333 " + nick + " " + channel + " " + nickSeter + " " + time + "\r\n"
 
 
@@ -38,7 +38,6 @@
 // #define RPL_NAMREPLY(host, clients, channelname, nick) ":" + host + " 353 " + nick + " = " + channelname + " :" + clients + "\r\n"
 // #define RPL_ENDOFNAMES(host, nick, channelname) ":" + host + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
 
-// #define RPL_MODEIS(channel, host, mode) ":" + host + " MODE " + channel + " " + mode + "\r\n"
 #define RPL_CHANNELMODEIS(channel, host, mode, modeArgs) ":" + host + " MODE " + channel + " " + mode + " " + modeArgs "\r\n"
 // #define RPL_MODEISLIMIT(channel, host, mode, newlimit) ":" + host + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
 // #define RPL_MODEISOP(channel, host, mode, target) ":" + host + " MODE " + channel + " " + mode + " " + target + "\r\n"
@@ -60,7 +59,7 @@
 
 // #define RPL_VIEWTOPIC(host, nick, channel, topic) ":" + host + " 332 " + nick + " " + channel + " :" + topic + "\r\n"
 // #define RPL_VIEWTIME(host, nick, channel, time) ":" + host + " 333 " + nick + " " + channel + " " + nick + " " + time + "\r\n"
-// #define RPL_SETTOPIC(nick, host, channel, topic) ":" + nick + "!" + nick + "@" + host + " TOPIC " + channel + " :" + topic + "\r\n"
+#define RPL_SETTOPIC(nick, host, channel, topic) ":" + nick + "!" + nick + "@" + host + " TOPIC " + channel + " :" + topic + "\r\n"
 
 // #define RPL_BOT(host, nick, message) ":" + host + " 001 " + nick + " Dad joke: " + message + "\r\n"
 // #define ERR_BOT(host, nick) ":" + host + " 450 " + nick + "enter [BOT generate] to generate a joke" + "\r\n"

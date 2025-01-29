@@ -1,15 +1,17 @@
 #include "Server.hpp"
 
-//ERR_NOSUCHCHANNEL (403) ELSEWHERE
-//ERR_CHANNELISFULL (471) LATER
-//ERR_INVITEONLYCHAN (473) LATER
-//RPL_TOPIC (332) LATER
-//RPL_TOPICWHOTIME (333) LATER
-//RPL_NAMREPLY (353) LATER
-//RPL_ENDOFNAMES (366) LATER
+void    Server::msgChannel(int fd, string msg, string channel)
+{
+    size_t index = getChannelIndex(_channels, channel);
+    size_t clientSize = _channels[index].getClientsSize();
+    vector<string>  clients = _channels[index].getClients();
+    for (size_t i = 0; i < clientSize; i++)
+    {
+        string nick = _clients[fd].getNickname();
+        sendMsg(getClientFd(clients[i]), msg);
+    }
+}
 
-
-//IMPLEMENT THIS
 void    Server::privmsgChannel(int fd, Command& cmd, string channel)
 {
     if (!channelExist(channel))

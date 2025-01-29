@@ -16,6 +16,8 @@ class Channel{
         int                 _userlimit;
         bool                _inviteOnly;
         vector<string>      _inviteList;
+        bool                _topicOnlyOperators;
+        string              _topic;
     public:
         Channel(){};
         Channel(int fd, string nick, string channelName);
@@ -37,6 +39,10 @@ class Channel{
         void    inviteUser(string nick);
         bool    isUserInvited(string nick) const;
         void    setOperator(string nick);
+        string  getTopic() const;
+        void    setTopic(string topic);
+        bool    topicOnlyOperators() const;
+        void    setTopicOnlyOperators(bool topicOnlyOperators);
 
         vector<string>  getClients();
 

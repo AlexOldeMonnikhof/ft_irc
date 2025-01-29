@@ -5,6 +5,8 @@ Channel::Channel(int fd, string nick, string channelName)
     _clients[nick] = true;
     _userlimit = 0;
     _inviteOnly = false;
+    _topicOnlyOperators = false;
+    _topic = "";
     cout << nick << " (fd=" << fd <<") created channel " << channelName << endl;
     setName(channelName);
 }
@@ -92,6 +94,26 @@ bool    Channel::getInviteOnly() const
 void    Channel::setInviteOnly(bool inviteOnly)
 {
     _inviteOnly = inviteOnly;
+}
+
+bool    Channel::topicOnlyOperators() const
+{
+    return _topicOnlyOperators;
+}
+
+void    Channel::setTopicOnlyOperators(bool topicOnlyOperators)
+{
+    _topicOnlyOperators = topicOnlyOperators;
+}
+
+string  Channel::getTopic() const
+{
+    return _topic;
+}
+
+void    Channel::setTopic(string topic)
+{
+    _topic = topic;
 }
 
 void    Channel::printClients()
