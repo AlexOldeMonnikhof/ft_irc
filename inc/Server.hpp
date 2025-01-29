@@ -68,6 +68,8 @@ class Server{
         void    cmdTopic(int fd, Command& cmd);
         void    modeTopic(int fd, Channel& channel, bool adding);
 
+        void    modeUserLimit(int fd, Channel& channel, bool adding, Command& cmd);
+
         void    modeOperator(int fd, Channel& channel, bool adding, Command& cmd);
 
         void    privmsgChannel(int fd, Command& cmd, string channel);

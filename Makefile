@@ -1,6 +1,6 @@
 NAME = ircserv
 SRC = 	main.cpp Server.cpp Client.cpp Command.cpp Channel.cpp utils.cpp \
-		invite.cpp join.cpp kick.cpp mode.cpp nick.cpp part.cpp pass.cpp privmsg.cpp topic.cpp user.cpp op.cpp
+		invite.cpp join.cpp kick.cpp mode.cpp nick.cpp part.cpp pass.cpp privmsg.cpp topic.cpp user.cpp op.cpp limit.cpp
 VPATH = src inc src/cmd
 FLAGS = -Wall -Wextra -Werror -std=c++98 -I inc
 CC = c++

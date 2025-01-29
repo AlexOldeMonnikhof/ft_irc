@@ -38,6 +38,11 @@ void    Server::cmdJoin(int fd, Command& cmd)
                 sendMsg(fd, ERR_INVITEONLY(_clients[fd].getNickname(), channels[i]));
                 continue;
             }
+            if (_channels[index].isFull())
+            {
+                sendMsg(fd, ERR_CHANNELISFULL(_clients[fd].getNickname(), channels[i]));
+                continue;
+            }
             _channels[index].join(fd, _clients[fd].getNickname());
         }
         else

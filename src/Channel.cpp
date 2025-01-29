@@ -75,12 +75,12 @@ vector<string> Channel::getClients()
     return clients;
 }
 
-void    Channel::setUsersLimit(int limit)
+void    Channel::setUserLimit(int limit)
 {
     _userlimit = limit;
 }
 
-int     Channel::getUsersLimit() const
+int     Channel::getUserLimit() const
 {
     return _userlimit;
 }
@@ -136,14 +136,11 @@ void    Channel::removeOperator(string nick)
     _clients[nick] = false;
 }
 
-void    Channel::setUsersLimit(int limit)
+bool    Channel::isFull() const
 {
-    _userlimit = limit;
-}
-
-int     Channel::getUsersLimit() const
-{
-    return _userlimit;
+    if (_userlimit && _clients.size() >= (size_t)_userlimit)
+        return true;
+    return false;
 }
 
 bool    Channel::isUserInvited(string nick) const

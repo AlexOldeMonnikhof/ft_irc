@@ -1,6 +1,5 @@
 #include "Server.hpp"
 
-//IMPLEMENT RPL_NICKCHANGE
 void    Server::cmdNICK(int fd, Command& cmd)
 {
     if (cmd.getSize() < 2)

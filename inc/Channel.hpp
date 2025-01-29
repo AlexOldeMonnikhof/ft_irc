@@ -32,8 +32,8 @@ class Channel{
         string  getPassword() const;
         void    setPassword(string password);
         size_t  getClientsSize() const;
-        void    setUsersLimit(int limit);
-        int     getUsersLimit() const;
+        void    setUserLimit(int limit);
+        int     getUserLimit() const;
         bool    getInviteOnly() const;
         void    setInviteOnly(bool inviteOnly);
         void    inviteUser(string nick);
@@ -42,10 +42,9 @@ class Channel{
         void    removeOperator(string nick);
         string  getTopic() const;
         void    setTopic(string topic);
-        int     getUsersLimit() const;
-        void    setUsersLimit(int limit);
         bool    topicOnlyOperators() const;
         void    setTopicOnlyOperators(bool topicOnlyOperators);
+        bool    isFull() const;
 
         vector<string>  getClients();
 

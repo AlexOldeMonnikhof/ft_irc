@@ -42,7 +42,7 @@ void Server::cmdMode(int fd, Command& cmd)
         //     modeKey(_channels[index], adding, cmd);
         else if (mode[j] == 't')
             modeTopic(fd, _channels[i], adding);
-        // else if (mode[j] == 'l')
-        //     modeLimit(_channels[index], adding, cmd);
+        else if (mode[j] == 'l')
+            modeUserLimit(fd, _channels[i], adding, cmd);
     }
 }

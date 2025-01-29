@@ -4,7 +4,7 @@
 #define RPL_WELCOME(nick, host) ":" + host + " 001 " + nick + " :Welcome " + nick + " to the ft_irc network\r\n"
 #define RPL_YOURHOST(nick, host) ":" + host + " 002 " + nick + " :Your host is " + host + " running version 1.0\r\n"
 #define RPL_CREATED(nick, host) ":" + host + " 003 " + nick + " :This server was created 2024-08-1\r\n"
-#define RPL_MYINFO(nick, host) ":" + host + " 004 " + nick + " :Host: " + host + ", Version: 1.0, User mode: none, Channel modes: o, t, k, i\r\n"
+#define RPL_MYINFO(nick, host) ":" + host + " 004 " + nick + " :Host: " + host + ", Version: 1.0, User mode: none, Channel modes: o, t, k, i & l\r\n"
 
 #define ERR_NOTREGISTERED(nick, host) ":" + host + " 451\r\n" + nick + ": You have not registered\r\n"
 #define ERR_NEEDMOREPARAMS(nick, host) ":" + host + " 461\r\n" + nick + ": Not enough parameters\r\n"
@@ -16,7 +16,7 @@
 #define ERR_NICKNAMEINUSE(nick, host) ":" + host + " 433\r\n" + nick + ": Nickname is already in use\r\n"
 
 
-// #define ERR_CHANNELISFULL(nick, channelName) ":" + nick + " 471 " + channelName + " :Cannot join channel (+l)\r\n"
+#define ERR_CHANNELISFULL(nick, channelName) ":" + nick + " 471 " + channelName + " :Cannot join channel (+l)\r\n"
 #define ERR_INVITEONLY(nick, channelName) ":" + nick + " 473 " + channelName + " :Cannot join channel (+i)\r\n"
 #define ERR_BADCHANNELKEY(nick, host, channelName) ":" + host + " 475\r\n" + nick + " " + channelName + ": Cannot join channel (+k)\r\n"
 #define ERR_BADCHANMASK(host, channelName) ":" + host + " 476\r\n" + channelName + ": Bad Channel Mask\r\n"
@@ -39,7 +39,7 @@
 // #define RPL_ENDOFNAMES(host, nick, channelname) ":" + host + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
 
 #define RPL_CHANNELMODEIS(channel, host, mode, modeArgs) ":" + host + " MODE " + channel + " " + mode + " " + modeArgs "\r\n"
-// #define RPL_MODEISLIMIT(channel, host, mode, newlimit) ":" + host + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
+#define RPL_MODEISLIMIT(channel, host, mode, newlimit) ":" + host + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
 #define RPL_MODEISOP(channel, host, mode, target) ":" + host + " MODE " + channel + " " + mode + " " + target + "\r\n"
 // #define ERR_INVALIDMODEPARAM(channel, host, flag) ":" + host + " 696 " + channel + " " + flag + " * you must specifiy a parameter for the op mode\r\n"
 #define ERR_USERNOTINCHANNEL(host, channel) ":" + host + " 441 " + channel + " " + ":they aren't on that channel\r\n"
