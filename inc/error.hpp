@@ -40,9 +40,9 @@
 
 #define RPL_CHANNELMODEIS(channel, host, mode, modeArgs) ":" + host + " MODE " + channel + " " + mode + " " + modeArgs "\r\n"
 // #define RPL_MODEISLIMIT(channel, host, mode, newlimit) ":" + host + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
-// #define RPL_MODEISOP(channel, host, mode, target) ":" + host + " MODE " + channel + " " + mode + " " + target + "\r\n"
+#define RPL_MODEISOP(channel, host, mode, target) ":" + host + " MODE " + channel + " " + mode + " " + target + "\r\n"
 // #define ERR_INVALIDMODEPARAM(channel, host, flag) ":" + host + " 696 " + channel + " " + flag + " * you must specifiy a parameter for the op mode\r\n"
-// #define ERR_USERNOTINCHANNEL(host, channel) ":" + host + " 441 " + channel + " " + ":they aren't on that channel\r\n"
+#define ERR_USERNOTINCHANNEL(host, channel) ":" + host + " 441 " + channel + " " + ":they aren't on that channel\r\n"
 // #define ERR_NOTOP(host, channel) ":" + host + " 482 " + channel + " " + ":You're not a channel operator\r\n"
 
 // #define RPL_CREATIONTIME(host, channelName, nick, time) ":" + host + " 329 " + nick + " " + channelName + " " + time + "\r\n"

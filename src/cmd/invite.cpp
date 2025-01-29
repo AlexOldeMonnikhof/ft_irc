@@ -51,7 +51,7 @@ void Server::modeInviteOnly(int fd, Channel& channel, bool adding)
         return;
     }
     channel.setInviteOnly(adding);
-    string mode = (adding ? "+t" : "-t");
+    string mode = (adding ? "+i" : "-i");
     sendMsg(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""));
     if (adding)
         cout << "channel " << channel.getName() << " is now invite only: " << endl;

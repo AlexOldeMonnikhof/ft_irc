@@ -36,8 +36,8 @@ void Server::cmdMode(int fd, Command& cmd)
     {
         if (mode[j] == 'i')
             modeInviteOnly(fd, _channels[i], adding);
-        // else if (mode[j] == 'o')
-        //     modeOperator(_channels[index], adding, cmd);
+        else if (mode[j] == 'o')
+            modeOperator(fd, _channels[i], adding, cmd);
         // else if (mode[j] == 'k')
         //     modeKey(_channels[index], adding, cmd);
         else if (mode[j] == 't')

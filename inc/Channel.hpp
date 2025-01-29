@@ -39,8 +39,11 @@ class Channel{
         void    inviteUser(string nick);
         bool    isUserInvited(string nick) const;
         void    setOperator(string nick);
+        void    removeOperator(string nick);
         string  getTopic() const;
         void    setTopic(string topic);
+        int     getUsersLimit() const;
+        void    setUsersLimit(int limit);
         bool    topicOnlyOperators() const;
         void    setTopicOnlyOperators(bool topicOnlyOperators);
 

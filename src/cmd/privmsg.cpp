@@ -19,18 +19,20 @@ void    Server::privmsgChannel(int fd, Command& cmd, string channel)
         sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channel, _clients[fd].getNickname()));
         return;
     }
-    else
+    size_t index = getChannelIndex(_channels, channel);
+    if (!_channels[index].clientInChannel(_clients[fd].getNickname()))
     {
-        size_t index = getChannelIndex(_channels, channel);
-        size_t clientSize = _channels[index].getClientsSize();
-        vector<string>  clients = _channels[index].getClients();
-        for (size_t i = 0; i < clientSize; i++)
-        {
-            string nick = _clients[fd].getNickname();
-            if (_channels[index].isOperator(nick))
-                nick += " -OP-";
-            sendMsg(getClientFd(clients[i]), nick + " (PRIVMSG " + channel + "): " + cmd.getCmd(2) + "\r\n");
-        }
+        sendMsg(fd, ERR_NOTONCHANNEL(_host, channel, _clients[fd].getNickname()));
+        return;
+    }
+    size_t clientSize = _channels[index].getClientsSize();
+    vector<string>  clients = _channels[index].getClients();
+    for (size_t i = 0; i < clientSize; i++)
+    {
+        string nick = _clients[fd].getNickname();
+        if (_channels[index].isOperator(nick))
+            nick += " -OP-";
+        sendMsg(getClientFd(clients[i]), nick + " (PRIVMSG " + channel + "): " + cmd.getCmd(2) + "\r\n");
     }
 }
 

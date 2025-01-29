@@ -63,7 +63,6 @@ void    Channel::setPassword(string password)
 
 size_t  Channel::getClientsSize() const
 {
-    cout << "clients size: " << _clients.size() << endl;
     return _clients.size();
 }
 
@@ -130,6 +129,21 @@ void    Channel::inviteUser(string nick)
 void    Channel::setOperator(string nick)
 {
     _clients[nick] = true;
+}
+
+void    Channel::removeOperator(string nick)
+{
+    _clients[nick] = false;
+}
+
+void    Channel::setUsersLimit(int limit)
+{
+    _userlimit = limit;
+}
+
+int     Channel::getUsersLimit() const
+{
+    return _userlimit;
 }
 
 bool    Channel::isUserInvited(string nick) const

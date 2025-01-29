@@ -26,7 +26,6 @@ class Command{
 
         void    parseCmd(string str);
 
-        //test
         vector<string> getV() const;
 
         void    setCmd(int i, string arg);
@@ -68,6 +67,8 @@ class Server{
 
         void    cmdTopic(int fd, Command& cmd);
         void    modeTopic(int fd, Channel& channel, bool adding);
+
+        void    modeOperator(int fd, Channel& channel, bool adding, Command& cmd);
 
         void    privmsgChannel(int fd, Command& cmd, string channel);
         void    privmsgClient(int fd, Command& cmd, string nick);
