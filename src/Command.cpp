@@ -1,11 +1,11 @@
 #include "Server.hpp"
 
-Command::Command(string str)
+Command::Command(std::string str)
 {
     parseCmd(str);
 }
 
-void  Command::parseCmd(string str)
+void  Command::parseCmd(std::string str)
 {
     std::string word = "";
     bool colonFound = false;
@@ -39,17 +39,17 @@ void  Command::parseCmd(string str)
         _cmd.push_back(word);
 }
 
-vector<string>  Command::getV() const
+std::vector<std::string>  Command::getV() const
 {
     return _cmd;
 }
 
-string  Command::getCmd(int i) const
+std::string  Command::getCmd(int i) const
 {
     return _cmd[i];
 }
 
-void    Command::setCmd(int i, string arg)
+void    Command::setCmd(int i, std::string arg)
 {
     _cmd[i] = arg;
 }

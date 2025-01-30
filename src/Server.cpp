@@ -5,20 +5,20 @@
 
 class Client;
 
-void    sendMsg(int fd, string msg)
+void    sendMsg(int fd, std::string msg)
 {
     send(fd, msg.c_str(), msg.length(), 0);
 }
 
-void    Server::msgAllClients(string msg)
+void    Server::msgAllClients(std::string msg)
 {
-    for (map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
+    for (std::map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
         sendMsg(iter->first, msg);
 }
 
-void    Server::parseServer(string port, string password)
+void    Server::parseServer(std::string port, std::string password)
 {
-    stringstream s(port);
+    std::stringstream s(port);
     if (!(s >> _port) || _port < 1024 || _port > 6553)
         throw std::runtime_error("Invalid port");
     if (!password.length())
@@ -104,11 +104,11 @@ void    Server::registerClient(int fd, Command& cmd)
     }
 }
 
-vector<string> splitVector(const string &s, char delimiter)
+std::vector<std::string> splitVector(const std::string &s, char delimiter)
 {
-    vector<string> tokens;
-    stringstream ss(s);
-    string token;
+    std::vector<std::string> tokens;
+    std::stringstream ss(s);
+    std::string token;
     while (getline(ss, token, delimiter))
         tokens.push_back(token);
     return tokens;
@@ -150,40 +150,40 @@ void    Server::cmdsClient(int fd, Command& cmd)
 
 }
 
-bool    checkIfHexChat(string str)
+bool    checkIfHexChat(std::string str)
 {
-    if (str.find("CAP") != string::npos)
+    if (str.find("CAP") != std::string::npos)
         return true;
     return false;
 }
 
-void    Server::handleHexChatRegister(int fd, string buffer)
+void    Server::handleHexChatRegister(int fd, std::string buffer)
 {
-    cout << "HexChat register" << endl;
-    string buff = buffer;
+   std::cout << "HexChat register" << std::endl;
+    std::string buff = buffer;
     std::size_t pos;
     std::size_t endpos;
     pos = buff.find("PASS");
-    if (pos == string::npos)
+    if (pos == std::string::npos)
         return;
     endpos = buff.find("\r\n", pos);
-    string pass = buff.substr(pos, endpos - pos);
+    std::string pass = buff.substr(pos, endpos - pos);
     Command Pass(pass);
     cmdPASS(fd, Pass);
     buff = buffer;
     pos = buff.find("NICK");
-    if (pos == string::npos)
+    if (pos == std::string::npos)
         return;
     endpos = buff.find("\r\n", pos);
-    string nick = buff.substr(pos, endpos - pos);
+    std::string nick = buff.substr(pos, endpos - pos);
     Command Nick(nick);
     cmdNICK(fd, Nick);
     buff = buffer;
     pos = buff.find("USER");
-    if (pos == string::npos)
+    if (pos == std::string::npos)
         return;
     endpos = buff.find("\r\n", pos);
-    string user = buff.substr(pos);
+    std::string user = buff.substr(pos);
     Command User(user);
     cmdUSER(fd, User);
     if (_clients[fd].getRegister() == 7)
@@ -213,7 +213,6 @@ void Server::handleMsgClient(int fd)
     {
         std::string line = partial[fd].substr(0, pos + 1);
         partial[fd].erase(0, pos + 1);
-        cout << line << endl;
         if (checkIfHexChat(line))
             handleHexChatRegister(fd, line);
         else
@@ -239,7 +238,7 @@ void    Server::mainLoop()
             {
                 if (_fds[i].fd == _socket)
                 {
-                    cout << "New client connected" << endl;
+                   std::cout << "New client connected" << std::endl;
                     addClient();
                 }
                 else
@@ -249,10 +248,10 @@ void    Server::mainLoop()
     }
 }
 
-Server::Server(string port, string password)
+Server::Server(std::string port, std::string password)
 {
     parseServer(port, password);
     initServer();
-    cout << _host << " listening on port " << _port << " with password " << _password << endl;
+    std::cout << _host << " listening on port " << _port << " with password " << _password << std::endl;
     mainLoop();
 }

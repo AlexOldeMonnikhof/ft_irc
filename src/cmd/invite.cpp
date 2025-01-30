@@ -8,8 +8,8 @@ void    Server::cmdInvite(int fd, Command& cmd)
         sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return;
     }
-    string nick = cmd.getCmd(1);
-    string channelName = cmd.getCmd(2);
+    std::string nick = cmd.getCmd(1);
+    std::string channelName = cmd.getCmd(2);
     size_t index = getChannelIndex(_channels, channelName);
     int targetFd = getClientFd(nick);
     if (!targetFd)
@@ -40,7 +40,7 @@ void    Server::cmdInvite(int fd, Command& cmd)
     _channels[index].inviteUser(nick);
     sendMsg(fd, RPL_INVITING(_host, _clients[fd].getNickname(), nick, channelName));
     sendMsg(targetFd, RPL_INVITE(_clients[fd].getNickname(), _clients[fd].getUsername(), _host, nick, channelName));
-    cout << "User " << _clients[fd].getNickname() << " invited " << nick << " to channel " << channelName << endl;
+    std::cout << "User " << _clients[fd].getNickname() << " invited " << nick << " to channel " << channelName << std::endl;
 }
 
 void Server::modeInviteOnly(int fd, Channel& channel, bool adding)
@@ -51,6 +51,6 @@ void Server::modeInviteOnly(int fd, Channel& channel, bool adding)
         return;
     }
     channel.setInviteOnly(adding);
-    string mode = (adding ? "+i" : "-i");
-    msgChannel(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""), channel.getName());
+    std::string mode = (adding ? "+i" : "-i");
+    msgChannel(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""), channel.getName(), true);
 }

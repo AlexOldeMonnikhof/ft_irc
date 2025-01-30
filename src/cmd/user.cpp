@@ -13,5 +13,5 @@ void    Server::cmdUSER(int fd, Command& cmd)
     _clients[fd].setRealname(cmd.getCmd(4));
     _clients[fd].setRegister(USERNAME);
     if (_clients[fd].getRegister() == 7)
-        cout << "Client is now registered" << endl;
+        std::cout << "Client is now registered" << std::endl;
 }

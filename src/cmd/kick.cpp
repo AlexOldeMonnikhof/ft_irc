@@ -9,7 +9,7 @@ void    Server::cmdKick(int fd, Command& cmd)
 		return;
 	}
 	size_t i = getChannelIndex(_channels, cmd.getCmd(1));
-	string target = cmd.getCmd(2);
+	std::string target = cmd.getCmd(2);
 	if (!channelExist(cmd.getCmd(1)))
 	{
 		sendMsg(fd, ERR_NOSUCHCHANNEL(_host, cmd.getCmd(2), _clients[fd].getNickname()));
@@ -39,7 +39,7 @@ void    Server::cmdKick(int fd, Command& cmd)
             sendMsg(fd, ERR_USERNOTINCHANNEL(_host, channel.getName()));
 			continue;
 		}
-        msgChannel(fd, RPL_KICK(_clients[fd].getNickname(), _clients[fd].getUsername(), _host, channel.getName(), targets[i]), channel.getName());
-        channel.part(getClientFd(targets[i]), targets[i], _host, _clients);
+        msgChannel(fd, RPL_KICK(_clients[fd].getNickname(), _clients[fd].getUsername(), _host, channel.getName(), targets[i]), channel.getName(), true);
+        channel.part(getClientFd(targets[i]), targets[i]);
 	}
 }

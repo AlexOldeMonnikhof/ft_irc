@@ -4,10 +4,8 @@ SRC = 	main.cpp Server.cpp Client.cpp Command.cpp Channel.cpp utils.cpp \
 VPATH = src inc src/cmd
 FLAGS = -Wall -Wextra -Werror -std=c++98 -I inc
 CC = c++
-CC = c++
 HEADERS = Server.hpp Client.hpp error.hpp Channel.hpp headers.hpp
 
-# OBJ = $(SRC:.cpp=.o)
 OBJ_DIR = obj
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
 

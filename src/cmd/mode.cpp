@@ -8,7 +8,7 @@ void Server::cmdMode(int fd, Command& cmd)
         sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return;
     }
-    string channel = cmd.getCmd(1);
+    std::string channel = cmd.getCmd(1);
     if (!channelExist(channel))
     {
         sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channel, _clients[fd].getNickname()));
@@ -26,14 +26,14 @@ void Server::cmdMode(int fd, Command& cmd)
         return;
     }
     bool adding = false;
-    string mode = cmd.getCmd(2);
+    std::string mode = cmd.getCmd(2);
     if (mode[0] == '+')
         adding = true;
     else if (mode[0] == '-')
         adding = false;
     else
     {
-        cout << "invalid mode: " << mode << endl;
+        std::cout << "invalid mode: " << mode << std::endl;
         return ;
     }
     size_t j = 0;

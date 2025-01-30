@@ -9,7 +9,7 @@ void    Server::cmdTopic(int fd, Command& cmd)
 		return;
 	}
     size_t i = getChannelIndex(_channels, cmd.getCmd(1));
-    string channelName = cmd.getCmd(1);
+    std::string channelName = cmd.getCmd(1);
 	if (!channelExist(channelName))
 	{
 		sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channelName, _clients[fd].getNickname()));
@@ -31,7 +31,7 @@ void    Server::cmdTopic(int fd, Command& cmd)
 		return;
 	}
 	_channels[i].setTopic(cmd.getCmd(2));
-	msgChannel(fd, RPL_SETTOPIC(_clients[fd].getNickname(), _host, channelName, cmd.getCmd(2)), channelName);
+	msgChannel(fd, RPL_SETTOPIC(_clients[fd].getNickname(), _host, channelName, cmd.getCmd(2)), channelName, true);
 }
 
 void    Server::modeTopic(int fd, Channel &channel, bool adding)
@@ -43,5 +43,5 @@ void    Server::modeTopic(int fd, Channel &channel, bool adding)
     }
     channel.setTopicOnlyOperators(adding);
     std::string mode = (adding ? "+t" : "-t");
-    msgChannel(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""), channel.getName());
+    msgChannel(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""), channel.getName(), true);
 }

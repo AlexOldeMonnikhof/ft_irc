@@ -2,7 +2,7 @@
 
 void    Server::cmdJoin(int fd, Command& cmd)
 {
-    vector<string>  channels, passwords;
+    std::vector<std::string>  channels, passwords;
     size_t j = 0;
     if (cmd.getSize() < 2)
     {
@@ -23,7 +23,7 @@ void    Server::cmdJoin(int fd, Command& cmd)
     for (size_t i = 0; i < channels.size(); i++)
     {
         size_t index = getChannelIndex(_channels, channels[i]);
-        if (index != string::npos)
+        if (index != std::string::npos)
         {
             if (!_channels[index].getPassword().empty())
             {
@@ -43,19 +43,14 @@ void    Server::cmdJoin(int fd, Command& cmd)
                 sendMsg(fd, ERR_CHANNELISFULL(_clients[fd].getNickname(), channels[i]));
                 continue;
             }
-            cout << "before join" << endl;
             _channels[index].join(fd, _clients[fd].getNickname());
-            cout << "after join" << endl;
-            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i]);
-            // sendMsg(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), _channels[i].getName(), _host));
+            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i], true);
             sendMsg(fd, RPL_ENDOFNAMES(_host, _clients[fd].getNickname(), _channels[i].getName()));
-            cout << "send message" << endl;
         }
         else
         {
             _channels.push_back(Channel(fd, _clients[fd].getNickname(), channels[i]));
-            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i]);
-            // sendMsg(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), _channels[i].getName(), _host));
+            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i], true);
             sendMsg(fd, RPL_ENDOFNAMES(_host, _clients[fd].getNickname(), _channels[i].getName()));
         }
     }

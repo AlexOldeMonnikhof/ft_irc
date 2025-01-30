@@ -1,13 +1,10 @@
 #include "Server.hpp"
 
-#include <iostream>
-using namespace std;
-
 int main(int argc, char **argv)
 {
     if (argc != 3)
     {
-        cout << "Usage: ./ircsercv port password" << endl;
+        std::cout << "Usage: ./ircsercv port password" << std::endl;
         return 1;
     }
     try
@@ -16,7 +13,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception& e)
     {
-        cout << e.what() << endl;
+        std::cout << e.what() << std::endl;
         return 1;
     }
     return 0;

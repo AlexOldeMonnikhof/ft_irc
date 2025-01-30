@@ -1,7 +1,6 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
-//quit function
 void    Server::cmdQuit(int fd, Command& cmd)
 {
     if (cmd.getSize() < 2)

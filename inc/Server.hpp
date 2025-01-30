@@ -12,49 +12,45 @@
 
 #define WHITE_SPACE "\f\n\r\t\v "
 
-using namespace std;
-
 class Client;
 class Channel;
 
 class Command{
     private:
-        vector<string>  _cmd;
+        std::vector<std::string>  _cmd;
     public:
         Command(){};
-        Command(string str);
+        Command(std::string str);
 
-        void    parseCmd(string str);
+        void    parseCmd(std::string str);
 
-        vector<string> getV() const;
+        std::vector<std::string> getV() const;
 
-        void    setCmd(int i, string arg);
-        string  getCmd(int i) const;
+        void    setCmd(int i, std::string arg);
+        std::string  getCmd(int i) const;
         size_t  getSize() const;
 };
-
-//PASS NICK USER
 
 class Server{
     private:
         int                     _port;
         int                     _socket;
-        string                  _password;
-        string                  _host;
-        vector<pollfd>          _fds;
-        map<int, Client>        _clients;
-        vector<Channel>         _channels;
+        std::string                  _password;
+        std::string                  _host;
+        std::vector<pollfd>          _fds;
+        std::map<int, Client>        _clients;
+        std::vector<Channel>         _channels;
     public:
-        Server(string port, string password);
-        void    parseServer(string port, string password);
+        Server(std::string port, std::string password);
+        void    parseServer(std::string port, std::string password);
         void    initServer();
         void    addClient();
         void    disconnectClient(int fd);
 
 
         void    cmdPASS(int fd, Command& cmd);
-        bool    isValidName(string nick);
-        bool    nickInUse(int fd, string nick);
+        bool    isValidName(std::string nick);
+        bool    nickInUse(int fd, std::string nick);
         void    cmdNICK(int fd, Command& cmd);
         void    cmdUSER(int fd, Command& cmd);
 
@@ -76,23 +72,23 @@ class Server{
 
         void    modeOperator(int fd, Channel& channel, bool adding, Command& cmd);
 
-        void    privmsgChannel(int fd, Command& cmd, string channel);
-        void    privmsgClient(int fd, Command& cmd, string nick);
+        void    privmsgChannel(int fd, Command& cmd, std::string channel);
+        void    privmsgClient(int fd, Command& cmd, std::string nick);
         void    cmdPrivmsg(int fd, Command& cmd);
-        void    msgChannel(int fd, string msg, string channel);
+        void    msgChannel(int fd, std::string msg, std::string channel, bool sendToSender);
 
         void    registerClient(int fd, Command& cmd);
         void    cmdsClient(int fd, Command& cmd);
         void    handleMsgClient(int fd);
-        void    handleHexChatRegister(int fd, string buffer);
+        void    handleHexChatRegister(int fd, std::string buffer);
 
-        bool    channelExist(string channel);
-        int     getClientFd(string nick);
-        void    msgAllClients(string msg);
+        bool    channelExist(std::string channel);
+        int     getClientFd(std::string nick);
+        void    msgAllClients(std::string msg);
 
         void    mainLoop();
 };
-void    sendMsg(int fd, string msg);
-vector<string>    splitVector(const string &s, char delimiter);
-size_t  getChannelIndex(vector<Channel>& channels, string name);
+void    sendMsg(int fd, std::string msg);
+std::vector<std::string>    splitVector(const std::string &s, char delimiter);
+size_t  getChannelIndex(std::vector<Channel>& channels, std::string name);
 #endif

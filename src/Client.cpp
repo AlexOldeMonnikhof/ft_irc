@@ -21,52 +21,52 @@ void    Client::setRegister(int value)
         _register = _register | 0b1;
 }
 
-string  Client::getNickname() const
+std::string  Client::getNickname() const
 {
     return (_nickname);
 }
 
-void    Client::setNickname(string nickname)
+void    Client::setNickname(std::string nickname)
 {
     _nickname = nickname;
 }
 
-string  Client::getUsername() const
+std::string  Client::getUsername() const
 {
     return (_username);
 }
 
-void    Client::setUsername(string username)
+void    Client::setUsername(std::string username)
 {
     _username = username;
 }
 
-string  Client::getHostname() const
+std::string  Client::getHostname() const
 {
     return (_hostname);
 }
 
-void    Client::setHostname(string hostname)
+void    Client::setHostname(std::string hostname)
 {
     _hostname = hostname;
 }
 
-string  Client::getServername() const
+std::string  Client::getServername() const
 {
     return (_servername);
 }
 
-void    Client::setServername(string servername)
+void    Client::setServername(std::string servername)
 {
     _servername = servername;
 }
 
-string  Client::getRealname() const
+std::string  Client::getRealname() const
 {
     return (_realname);
 }
 
-void    Client::setRealname(string realname)
+void    Client::setRealname(std::string realname)
 {
     _realname = realname;
 }

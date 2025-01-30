@@ -9,32 +9,30 @@
 
 #include <string>
 
-using namespace std;
-
 class Client{
     private:
         int             _socket;
         int             _register;
-        string          _nickname;
-        string          _username;
-        string          _hostname;
-        string          _servername;
-        string          _realname;
+        std::string          _nickname;
+        std::string          _username;
+        std::string          _hostname;
+        std::string          _servername;
+        std::string          _realname;
     public:
         Client(){};
         Client(int socket);
         int         getRegister() const;
         void        setRegister(int value);
-        string      getNickname() const;
-        void        setNickname(string nickname);
-        string      getUsername() const;
-        void        setUsername(string username);
-        string      getHostname() const;
-        void        setHostname(string hostname);
-        string      getServername() const;
-        void        setServername(string servername);
-        string      getRealname() const;
-        void        setRealname(string realname);
+        std::string      getNickname() const;
+        void        setNickname(std::string nickname);
+        std::string      getUsername() const;
+        void        setUsername(std::string username);
+        std::string      getHostname() const;
+        void        setHostname(std::string hostname);
+        std::string      getServername() const;
+        void        setServername(std::string servername);
+        std::string      getRealname() const;
+        void        setRealname(std::string realname);
 };
 
 #endif

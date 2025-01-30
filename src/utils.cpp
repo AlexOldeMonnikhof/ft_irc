@@ -1,16 +1,16 @@
 #include "Server.hpp"
 
-size_t getChannelIndex(vector<Channel>& channels, string name)
+size_t getChannelIndex(std::vector<Channel>& channels, std::string name)
 {
     for (size_t i = 0; i < channels.size(); i++)
     {
         if (channels[i].getName() == name)
             return i;
     }
-    return string::npos;
+    return std::string::npos;
 }
 
-bool    Server::channelExist(string channel)
+bool    Server::channelExist(std::string channel)
 {
     for (size_t i = 0; i < _channels.size(); i++)
     {
@@ -20,7 +20,7 @@ bool    Server::channelExist(string channel)
     return false;
 }
 
-bool    Server::isValidName(string nick)
+bool    Server::isValidName(std::string nick)
 {
     for (size_t i = 0; i < nick.size(); i++)
     {
@@ -33,9 +33,9 @@ bool    Server::isValidName(string nick)
     return true;
 }
 
-bool    Server::nickInUse(int fd, string nick)
+bool    Server::nickInUse(int fd, std::string nick)
 {
-    for (vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
+    for (std::vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
     {
         if (iter->fd == fd)
             continue;
@@ -45,9 +45,9 @@ bool    Server::nickInUse(int fd, string nick)
     return false;
 }
 
-int     Server::getClientFd(string nick)
+int     Server::getClientFd(std::string nick)
 {
-    for (map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
+    for (std::map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
     {
         if (iter->second.getNickname() == nick)
             return iter->first;
