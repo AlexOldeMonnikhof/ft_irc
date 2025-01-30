@@ -48,6 +48,8 @@
 #define RPL_YOUREOPER(host, nick) ":" + host + " 381 " + nick + ":You are now an IRC operator\r\n"
 #define RPL_KICK(kicker, username, host, channel, targetuser) ":" + kicker + "!" + username + "@" + host + " KICK " + channel + " " + targetuser + "\r\n"
 #define PRIVMSG_FORMATCH(senderNick, senderUsername, senderhost, receiver, message) ":" + senderNick + "!~" + senderUsername + "@" + senderhost + " PRIVMSG " + receiver + " :" + message + "\r\n"
+#define PRIVMSG_FORMATUSER(senderNick, senderUser, senderHost, recipientNick, message) (":" + (senderNick) + "!" + (senderUser) + "@" + (senderHost) + " PRIVMSG " + (recipientNick) + " :" + (message)) + "\r\n"
+
 #define ERR_UNKNOWNCOMMAND(host, nick, command) ":" + host + " 421 " + nick + " " + command + ": Unknown command\r\n"
 
 #define ERR_CHANOPRIVSNEEDED(host, nick, channel) ":" + host + " 482 " + nick + " " + channel + ": You're not channel operator\r\n"

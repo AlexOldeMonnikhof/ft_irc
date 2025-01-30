@@ -159,7 +159,6 @@ bool    checkIfHexChat(std::string str)
 
 void    Server::handleHexChatRegister(int fd, std::string buffer)
 {
-   std::cout << "HexChat register" << std::endl;
     std::string buff = buffer;
     std::size_t pos;
     std::size_t endpos;

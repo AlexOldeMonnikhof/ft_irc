@@ -39,7 +39,7 @@ void    Server::privmsgClient(int fd, Command& cmd, std::string nick)
     if (!targetFd)
         sendMsg(fd, ERR_NOSUCHNICK(_host, nick));
     else
-        sendMsg(targetFd, "PRIVMSG " + nick + " :" + cmd.getCmd(2) + "\r\n");
+        sendMsg(targetFd, PRIVMSG_FORMATUSER(_clients[fd].getNickname(), _clients[fd].getUsername(), _host, nick, cmd.getCmd(2)));
 }
 
 void    Server::cmdPrivmsg(int fd, Command& cmd)
