@@ -27,7 +27,8 @@ void  Command::parseCmd(string str)
         else if (str[i] == ':' && !colonFound)
         {
                 colonFound = true;
-                _cmd.push_back(word);
+                if (!word.empty())
+                    _cmd.push_back(word);
                 word.clear();
         }
         else

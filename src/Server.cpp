@@ -10,6 +10,12 @@ void    sendMsg(int fd, string msg)
     send(fd, msg.c_str(), msg.length(), 0);
 }
 
+void    Server::msgAllClients(string msg)
+{
+    for (map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
+        sendMsg(iter->first, msg);
+}
+
 void    Server::parseServer(string port, string password)
 {
     stringstream s(port);
@@ -137,6 +143,8 @@ void    Server::cmdsClient(int fd, Command& cmd)
         cmdTopic(fd, cmd);
     else if (cmd.getCmd(0) == "KICK")
         cmdKick(fd, cmd);
+    else if (cmd.getCmd(0) == "QUIT")
+        cmdQuit(fd, cmd);
     else
         sendMsg(fd, ERR_UNKNOWNCOMMAND(_host, _clients[fd].getNickname(), cmd.getCmd(0)));
 
@@ -205,6 +213,7 @@ void Server::handleMsgClient(int fd)
     {
         std::string line = partial[fd].substr(0, pos + 1);
         partial[fd].erase(0, pos + 1);
+        cout << line << endl;
         if (checkIfHexChat(line))
             handleHexChatRegister(fd, line);
         else

@@ -6,20 +6,20 @@
 #define RPL_CREATED(nick, host) ":" + host + " 003 " + nick + " :This server was created 2024-08-1\r\n"
 #define RPL_MYINFO(nick, host) ":" + host + " 004 " + nick + " :Host: " + host + ", Version: 1.0, User mode: none, Channel modes: o, t, k, i & l\r\n"
 
-#define ERR_NOTREGISTERED(nick, host) ":" + host + " 451\r\n" + nick + ": You have not registered\r\n"
-#define ERR_NEEDMOREPARAMS(nick, host) ":" + host + " 461\r\n" + nick + ": Not enough parameters\r\n"
-#define ERR_ALREADYREGISTERED(nick, host) ":" + host + " 462\r\n" + nick + ": You may not reregister\r\n"
-#define ERR_PASSWDMISMATCH(nick, host) ":" + host + " 464\r\n" + nick + ": Password incorrect\r\n"
+#define ERR_NOTREGISTERED(nick, host) ":" + host + " 451 " + nick + ": You have not registered\r\n"
+#define ERR_NEEDMOREPARAMS(nick, host) ":" + host + " 461 " + nick + ": Not enough parameters\r\n"
+#define ERR_ALREADYREGISTERED(nick, host) ":" + host + " 462 " + nick + ": You may not reregister\r\n"
+#define ERR_PASSWDMISMATCH(nick, host) ":" + host + " 464 " + nick + ": Password incorrect\r\n"
 
-#define ERR_NONICKNAMEGIVEN(nick, host) ":" + host + " 431\r\n" + nick + ": No nickname given\r\n"
-#define ERR_ERRONEUSNICKNAME(nick, host) ":" + host + " 432\r\n" + nick + ": Erroneus nickname\r\n"
-#define ERR_NICKNAMEINUSE(nick, host) ":" + host + " 433\r\n" + nick + ": Nickname is already in use\r\n"
+#define ERR_NONICKNAMEGIVEN(nick, host) ":" + host + " 431 " + nick + ": No nickname given\r\n"
+#define ERR_ERRONEUSNICKNAME(nick, host) ":" + host + " 432 " + nick + ": Erroneus nickname\r\n"
+#define ERR_NICKNAMEINUSE(nick, host) ":" + host + " 433 " + nick + ": Nickname is already in use\r\n"
 
 
 #define ERR_CHANNELISFULL(nick, channelName) ":" + nick + " 471 " + channelName + " :Cannot join channel (+l)\r\n"
 #define ERR_INVITEONLY(nick, channelName) ":" + nick + " 473 " + channelName + " :Cannot join channel (+i)\r\n"
 #define ERR_BADCHANNELKEY(nick, host, channelName) ":" + host + " 475\r\n" + nick + " " + channelName + ": Cannot join channel (+k)\r\n"
-#define ERR_BADCHANMASK(host, channelName) ":" + host + " 476\r\n" + channelName + ": Bad Channel Mask\r\n"
+#define ERR_BADCHANMASK(host, channelName) ":" + host + " 476 " + channelName + ": Bad Channel Mask\r\n"
 
 // // //topic
 // // S <-   :dan!d@Clk-830D7DDC TOPIC #v3 :This is a cool channel!!
@@ -32,11 +32,11 @@
 
 
 #define RPL_JOIN(nick, username, channelname, ipaddress) ":" + nick + "!~" + username + "@" + ipaddress + " JOIN " + channelname + "\r\n"
-// #define RPL_PART(host, nick, username, channel, reason) ":"+nick+"!"+username+ "@" + host +" PART "  + channel+" "+reason+ "\r\n"
-// #define RPL_QUIT(host, nick, username, reason) ":"+nick+"!"+username+ "@" + host +" QUIT :"+reason+ "\r\n"
+#define RPL_PART(host, nick, username, channel, reason) ":"+nick+"!"+username+ "@" + host +" PART "  + channel+" "+reason+ "\r\n"
+#define RPL_QUIT(host, nick, username, reason) ":"+nick+"!"+username+ "@" + host +" QUIT :"+reason+ "\r\n"
 
-// #define RPL_NAMREPLY(host, clients, channelname, nick) ":" + host + " 353 " + nick + " = " + channelname + " :" + clients + "\r\n"
-// #define RPL_ENDOFNAMES(host, nick, channelname) ":" + host + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
+#define RPL_NAMREPLY(host, clients, channelname, nick) ":" + host + " 353 " + nick + " = " + channelname + " :" + clients + "\r\n"
+#define RPL_ENDOFNAMES(host, nick, channelname) ":" + host + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
 
 #define RPL_MODEIS(channel, hostname, mode) ":" + hostname + " MODE " + channel + " " + mode + "\r\n"
 #define RPL_CHANNELMODEIS(channel, host, mode, modeArgs) ":" + host + " MODE " + channel + " " + mode + " " + modeArgs "\r\n"
@@ -51,9 +51,9 @@
 
 #define RPL_INVITING(host, inviting, invited, channel) ":" + host + " 341 " + inviting + " " + invited + " " + channel + " :Inviting " + invited + " to " + channel + "\r\n"
 #define RPL_INVITE(nick, username, clienthost, invited, channel) ":" + nick + "!" + username + "@" + clienthost + " INVITE " + invited + " :" + channel + "\r\n"
-#define ERR_NOSUCHNICK(host, nick) ":" + host + " 401\r\n" + nick + ": No such nick/channel\r\n"
-#define ERR_NOSUCHCHANNEL(host, channel, nick) ":" + host + " 403\r\n" + nick + " " + channel + ": No such channel\r\n"
-#define ERR_NOTONCHANNEL(host, channel, nick) ":" + host + " 442\r\n" + nick + " " + channel + ": You're not on that channel\r\n"
+#define ERR_NOSUCHNICK(host, nick) ":" + host + " 401 " + nick + ": No such nick/channel\r\n"
+#define ERR_NOSUCHCHANNEL(host, channel, nick) ":" + host + " 403 " + nick + " " + channel + ": No such channel\r\n"
+#define ERR_NOTONCHANNEL(host, channel, nick) ":" + host + " 442 " + nick + " " + channel + ": You're not on that channel\r\n"
 #define ERR_USERONCHANNEL(host, channel, nick) ":" + host + " 443 " + nick + " " + channel + "  :is already on channel\r\n"
 
 // #define ERR_INPUTTOOLONG(nick, host) ":" + host + " 417 " + nick + " :Input line was too long\r\n"
@@ -62,8 +62,6 @@
 // #define RPL_VIEWTIME(host, nick, channel, time) ":" + host + " 333 " + nick + " " + channel + " " + nick + " " + time + "\r\n"
 #define RPL_SETTOPIC(nick, host, channel, topic) ":" + nick + "!" + nick + "@" + host + " TOPIC " + channel + " :" + topic + "\r\n"
 
-// #define RPL_BOT(host, nick, message) ":" + host + " 001 " + nick + " Dad joke: " + message + "\r\n"
-// #define ERR_BOT(host, nick) ":" + host + " 450 " + nick + "enter [BOT generate] to generate a joke" + "\r\n"
 // #define RPL_UMODEIS(host, channelname) ":" + host + " MODE " + channelname + " +nt\r\n"
 
 // #define ERR_UNKNOWNMODE(nick, host, channel, character) ":" + host + " 472 " + nick + " " + channel + " " + character + " :is unknown mode char to me\r\n"
@@ -78,11 +76,5 @@
 // #define RPL_INVITELIST(nick, host, invitedChannel) ":" + host + " 346 " + nick + " " + invitedChannel + " :Invite list\r\n"
 // #define RPL_ENDOFINVITELIST(nick, host) ":" + host + " 347 " + nick + " :End of invite list\r\n"
 // #define RPL_NOTOPIC(nick, host, channel) ":" + host + " 331 " + nick + " " + channel + " :No topic is set\r\n"
-
-// #define ERR_CANNOTSENDTOCHAN(nick, channel, host) ":" + host + " 404 " + nick + " " + channel + " :Cannot send to channel\r\n"
-
-// // PING PONG
-// #define RPL_PONG(host, nick) ":" + nick + " PING " + host + "\r\n"
-// #define RPL_PING(host, nick) ":" + host + " PONG " + nick + "\r\n"
 
 #endif

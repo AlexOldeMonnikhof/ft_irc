@@ -4,7 +4,7 @@ void    Server::cmdPart(int fd, Command& cmd)
 {
     vector<string>  channels;
 
-    if (cmd.getSize() < 2)
+    if (cmd.getSize() < 3)
     {
         sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return;
@@ -24,7 +24,10 @@ void    Server::cmdPart(int fd, Command& cmd)
         if (index != string::npos)
         {
             if (_channels[index].clientInChannel(_clients[fd].getNickname()))
+            {
                 _channels[index].part(fd, _clients[fd].getNickname(), _host, _clients);
+                msgChannel(fd, RPL_PART(_host, _clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], cmd.getCmd(2)), channels[i]);
+            }
             else
                 sendMsg(fd, ERR_NOTONCHANNEL(_host, channels[i], _clients[fd].getNickname()));
             if (_channels[index].getClientsSize() == 0)

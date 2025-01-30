@@ -43,10 +43,5 @@ void    Server::modeTopic(int fd, Channel &channel, bool adding)
     }
     channel.setTopicOnlyOperators(adding);
     std::string mode = (adding ? "+t" : "-t");
-    sendMsg(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""));
-
-    if (adding)
-        std::cout << "Channel " << channel.getName() << " now requires operators for topic changes.\n";
-    else
-        std::cout << "Channel " << channel.getName() << " no longer restricts topic changes to operators.\n";
+    msgChannel(fd, RPL_CHANNELMODEIS(channel.getName(), _host, mode, ""), channel.getName());
 }

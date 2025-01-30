@@ -62,6 +62,7 @@ class Server{
         void    cmdPart(int fd, Command& cmd);
         void    cmdMode(int fd, Command& cmd);
         void    cmdKick(int fd, Command& cmd);
+        void    cmdQuit(int fd, Command& cmd);
 
         void    cmdInvite(int fd, Command& cmd);
         void    modeInviteOnly(int fd, Channel& channel, bool adding);
@@ -87,6 +88,7 @@ class Server{
 
         bool    channelExist(string channel);
         int     getClientFd(string nick);
+        void    msgAllClients(string msg);
 
         void    mainLoop();
 };

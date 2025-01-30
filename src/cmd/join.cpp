@@ -43,10 +43,20 @@ void    Server::cmdJoin(int fd, Command& cmd)
                 sendMsg(fd, ERR_CHANNELISFULL(_clients[fd].getNickname(), channels[i]));
                 continue;
             }
-            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i]);
+            cout << "before join" << endl;
             _channels[index].join(fd, _clients[fd].getNickname());
+            cout << "after join" << endl;
+            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i]);
+            // sendMsg(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), _channels[i].getName(), _host));
+            sendMsg(fd, RPL_ENDOFNAMES(_host, _clients[fd].getNickname(), _channels[i].getName()));
+            cout << "send message" << endl;
         }
         else
+        {
             _channels.push_back(Channel(fd, _clients[fd].getNickname(), channels[i]));
+            msgChannel(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], _host), channels[i]);
+            // sendMsg(fd, RPL_JOIN(_clients[fd].getNickname(), _clients[fd].getUsername(), _channels[i].getName(), _host));
+            sendMsg(fd, RPL_ENDOFNAMES(_host, _clients[fd].getNickname(), _channels[i].getName()));
+        }
     }
 }
