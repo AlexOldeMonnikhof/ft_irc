@@ -12,7 +12,6 @@ void    Server::cmdKick(int fd, Command& cmd)
 	}
 
 	size_t i = getChannelIndex(_channels, cmd.getCmd(1));
-	std::string target = cmd.getCmd(2);
 	if (!channelExist(cmd.getCmd(1)))
 	{
 		sendMsg(fd, ERR_NOSUCHCHANNEL(_host, cmd.getCmd(2), _clients[fd].getNickname()));
