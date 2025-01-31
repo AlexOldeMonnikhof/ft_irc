@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Command.hpp"
+#include "error.hpp"
 
 void    Server::cmdJoin(int fd, Command& cmd)
 {

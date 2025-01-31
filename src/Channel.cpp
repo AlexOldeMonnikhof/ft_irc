@@ -1,4 +1,7 @@
+#include <iostream>
+
 #include "Channel.hpp"
+#include "Server.hpp"
 
 Channel::Channel(int fd, const std::string &nick, const std::string &channelName) : _userlimit(50), _inviteOnly(false), _topicOnlyOperators(false), _topic("")
 {

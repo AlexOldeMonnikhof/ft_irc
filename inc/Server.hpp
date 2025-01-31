@@ -1,10 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "headers.hpp"
+#include <poll.h>
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "error.hpp"
 
 #define WAIT_FOREVER -1
 

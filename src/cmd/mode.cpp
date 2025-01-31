@@ -1,6 +1,9 @@
+#include <iostream>
+
 #include "Server.hpp"
 #include "Channel.hpp"
 #include "Command.hpp"
+#include "error.hpp"
 
 void Server::cmdMode(int fd, Command& cmd)
 {

@@ -1,8 +1,15 @@
+#include <cstring>
+#include <fcntl.h>
+#include <iostream>
+#include <netinet/in.h>
+#include <sstream>
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include "Server.hpp"
 #include "Client.hpp"
 #include "error.hpp"
 #include "Command.hpp"
-#include "headers.hpp"
 
 class Client;
 
