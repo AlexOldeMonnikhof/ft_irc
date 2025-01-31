@@ -1,10 +1,10 @@
 NAME = ircserv
 SRC = 	main.cpp Server.cpp Client.cpp Command.cpp Channel.cpp utils.cpp \
-		invite.cpp join.cpp kick.cpp mode.cpp nick.cpp part.cpp pass.cpp privmsg.cpp topic.cpp user.cpp op.cpp limit.cpp key.cpp quit.cpp
+		invite.cpp join.cpp kick.cpp mode.cpp nick.cpp part.cpp pass.cpp privmsg.cpp topic.cpp user.cpp op.cpp limit.cpp key.cpp quit.cpp Chatbot.cpp
 VPATH = src inc src/cmd
 FLAGS = -Wall -Wextra -Werror -std=c++98 -I inc
 CC = c++
-HEADERS = Server.hpp Client.hpp error.hpp Channel.hpp headers.hpp
+HEADERS = Server.hpp Client.hpp error.hpp Channel.hpp headers.hpp Chatbot.hpp
 
 OBJ_DIR = obj
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
