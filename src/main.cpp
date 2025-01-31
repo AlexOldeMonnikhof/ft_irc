@@ -7,6 +7,7 @@ int main(int argc, char **argv)
         std::cerr << "Usage: ./ircsercv port password" << '\n';
         return 1;
     }
+
     try
     {
         Server server(argv[1], argv[2]);
@@ -16,5 +17,6 @@ int main(int argc, char **argv)
         std::cerr << e.what() << '\n';
         return 1;
     }
+
     return 0;
 }
