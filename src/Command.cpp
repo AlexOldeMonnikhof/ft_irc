@@ -17,11 +17,7 @@ void  Command::parseCmd(std::string str)
 
     for (size_t i = 0; i < str.size(); i++)
     {
-        if (colonFound)
-        {
-            word += str[i];
-        }
-        else if (std::isspace(str[i]))
+        if (std::isspace(str[i]))
         {
             if (!word.empty())
             {
