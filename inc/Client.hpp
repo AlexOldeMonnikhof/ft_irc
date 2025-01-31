@@ -19,8 +19,13 @@ class Client{
         std::string _servername;
         std::string _realname;
     public:
-        Client(){};
         Client(int socket);
+        Client(int fd, const std::string &nick, const std::string &channelName);
+        Client(const Client &rhs);
+        Client &operator=(const Client &rhs);
+        ~Client();
+
+    public:
         int         getRegister() const;
         void        setRegister(int value);
         std::string getNickname() const;

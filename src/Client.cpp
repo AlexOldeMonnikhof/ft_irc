@@ -1,8 +1,36 @@
 #include "Client.hpp"
 
-Client::Client(int socket) : _socket(0), _register(0) {
+Client::Client(int socket) : _socket(0), _register(0)
+{
     _socket = socket;
 }
+
+Client::Client(const Client &rhs) :
+    _socket(rhs._socket),
+    _register(rhs._register),
+    _nickname(rhs._nickname),
+    _username(rhs._username),
+    _hostname(rhs._hostname),
+    _servername(rhs._servername),
+    _realname(rhs._realname)
+{}
+
+Client &Client::operator=(const Client &rhs)
+{
+    if (this != &rhs) {
+        _socket = rhs._socket;
+        _register = rhs._register;
+        _nickname = rhs._nickname;
+        _username = rhs._username;
+        _hostname = rhs._hostname;
+        _servername = rhs._servername;
+        _realname = rhs._realname;
+    }
+
+    return *this;
+}
+
+Client::~Client() {}
 
 int Client::getRegister() const
 {
