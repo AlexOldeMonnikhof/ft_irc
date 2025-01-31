@@ -13,7 +13,9 @@ void    sendMsg(int fd, const std::string &msg)
 void    Server::msgAllClients(const std::string &msg)
 {
     for (std::map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
+    {
         sendMsg(iter->first, msg);
+    }
 }
 
 void    Server::parseServer(const std::string &port, const std::string &password)
