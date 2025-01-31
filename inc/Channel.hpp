@@ -17,9 +17,12 @@ class Channel{
         bool                        _topicOnlyOperators;
         std::string                 _topic;
     public:
-        Channel(){};
         Channel(int fd, const std::string &nick, const std::string &channelName);
+        Channel(const Channel &rhs);
+        Channel &operator=(const Channel &rhs);
+        ~Channel();
 
+    public:
         void                        join(int fd, const std::string &nick);
         void                        part(int fd, const std::string &nick);
 

@@ -7,6 +7,34 @@ Channel::Channel(int fd, const std::string &nick, const std::string &channelName
     setName(channelName);
 }
 
+Channel::Channel(const Channel &rhs) :
+    _name(rhs._name),
+    _password(rhs._password),
+    _clients(rhs._clients),
+    _userlimit(rhs._userlimit),
+    _inviteOnly(rhs._inviteOnly),
+    _inviteList(rhs._inviteList),
+    _topicOnlyOperators(rhs._topicOnlyOperators),
+    _topic(rhs._topic)
+{}
+
+Channel &Channel::operator=(const Channel &rhs) {
+    if (this != &rhs) {
+        _name = rhs._name;
+        _password = rhs._password;
+        _clients = rhs._clients;
+        _userlimit = rhs._userlimit;
+        _inviteOnly = rhs._inviteOnly;
+        _inviteList = rhs._inviteList;
+        _topicOnlyOperators = rhs._topicOnlyOperators;
+        _topic = rhs._topic;
+    }
+
+    return *this;
+}
+
+Channel::~Channel() {}
+
 void    Channel::join(int fd, const std::string &nick)
 {
     if (_clients.find(nick) != _clients.end())
