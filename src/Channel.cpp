@@ -1,13 +1,13 @@
 #include "Channel.hpp"
 
-Channel::Channel(int fd, std::string nick, std::string channelName) : _userlimit(50), _inviteOnly(false), _topicOnlyOperators(false), _topic("")
+Channel::Channel(int fd, const std::string &nick, const std::string &channelName) : _userlimit(50), _inviteOnly(false), _topicOnlyOperators(false), _topic("")
 {
     _clients[nick] = true;
     std::cout << nick << " (" << fd <<") created channel " << channelName << '\n';
     setName(channelName);
 }
 
-void    Channel::join(int fd, std::string nick)
+void    Channel::join(int fd, const std::string &nick)
 {
     if (_clients.find(nick) != _clients.end())
     {
@@ -19,13 +19,13 @@ void    Channel::join(int fd, std::string nick)
     }
 }
 
-void    Channel::part(int fd, std::string nick)
+void    Channel::part(int fd, const std::string &nick)
 {
     _clients.erase(nick);
     std::cout << nick << " (" << fd <<") left channel " << _name << '\n';
 }
 
-bool    Channel::clientInChannel(std::string nick)
+bool    Channel::clientInChannel(const std::string &nick)
 {
     if (_clients.find(nick) != _clients.end())
     {
@@ -40,7 +40,7 @@ std::string  Channel::getName() const
     return _name;
 }
 
-void    Channel::setName(std::string name)
+void    Channel::setName(const std::string &name)
 {
     _name = name;
 }
@@ -50,7 +50,7 @@ std::string  Channel::getPassword() const
     return _password;
 }
 
-void    Channel::setPassword(std::string password)
+void    Channel::setPassword(const std::string &password)
 {
     _password = password;
 }
@@ -107,7 +107,7 @@ std::string  Channel::getTopic() const
     return _topic;
 }
 
-void    Channel::setTopic(std::string topic)
+void    Channel::setTopic(const std::string &topic)
 {
     _topic = topic;
 }
@@ -116,21 +116,21 @@ void    Channel::printClients()
 {
     for (std::map<std::string, bool>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
     {
-        std::cout << iter->first << std::endl;
+        std::cout << iter->first << '\n';
     }
 }
 
-void    Channel::inviteUser(std::string nick)
+void    Channel::inviteUser(const std::string &nick)
 {
     _inviteList.push_back(nick);
 }
 
-void    Channel::setOperator(std::string nick)
+void    Channel::setOperator(const std::string &nick)
 {
     _clients[nick] = true;
 }
 
-void    Channel::removeOperator(std::string nick)
+void    Channel::removeOperator(const std::string &nick)
 {
     _clients[nick] = false;
 }
@@ -145,7 +145,7 @@ bool    Channel::isFull() const
     return false;
 }
 
-bool    Channel::isUserInvited(std::string nick) const
+bool    Channel::isUserInvited(const std::string &nick) const
 {
     for (size_t i = 0; i < _inviteList.size(); i++)
     {
@@ -158,7 +158,7 @@ bool    Channel::isUserInvited(std::string nick) const
     return false;
 }
 
-bool    Channel::isOperator(const std::string nick)
+bool    Channel::isOperator(const std::string &nick)
 {
     std::map<std::string, bool>::const_iterator it = _clients.find(nick);
     if (it != _clients.end())
