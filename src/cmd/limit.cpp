@@ -7,7 +7,6 @@
 
 void    Server::modeUserLimit(int fd, Channel& channel, bool adding, Command& cmd)
 {
-    int limit = 0;
     if (adding)
     {
         if (cmd.getSize() < 4)
@@ -15,7 +14,7 @@ void    Server::modeUserLimit(int fd, Channel& channel, bool adding, Command& cm
             sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         } else
         {
-            limit = atoi(cmd.getCmd(3).c_str());
+            int limit = atoi(cmd.getCmd(3).c_str());
             if (limit && (limit > 0 && limit < 1000))
             {
                 channel.setUserLimit(limit);
