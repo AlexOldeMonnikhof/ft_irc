@@ -9,6 +9,7 @@ void    Server::cmdPart(int fd, Command& cmd)
         sendMsg(fd, ERR_NEEDMOREPARAMS(_clients[fd].getNickname(), _host));
         return;
     }
+
     channels = splitVector(cmd.getCmd(1), ',');
     for (size_t i = 0; i < channels.size(); i++)
     {
@@ -18,6 +19,7 @@ void    Server::cmdPart(int fd, Command& cmd)
             return;
         }
     }
+
     for (size_t i = 0; i < channels.size(); i++)
     {
         size_t index = getChannelIndex(_channels, channels[i]);
@@ -27,13 +29,18 @@ void    Server::cmdPart(int fd, Command& cmd)
             {
                 msgChannel(fd, RPL_PART(_host, _clients[fd].getNickname(), _clients[fd].getUsername(), channels[i], cmd.getCmd(2)), channels[i], true);
                 _channels[index].part(fd, _clients[fd].getNickname());
-            }
-            else
+            } else
+            {
                 sendMsg(fd, ERR_NOTONCHANNEL(_host, channels[i], _clients[fd].getNickname()));
+            }
+
             if (_channels[index].getClientsSize() == 0)
+            {
                 _channels.erase(_channels.begin() + index);
-        }
-        else
+            }
+        } else
+        {
             sendMsg(fd, ERR_NOSUCHCHANNEL(_host, channels[i], _clients[fd].getNickname()));
+        }
     }
 }
