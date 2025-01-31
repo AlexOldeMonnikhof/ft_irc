@@ -4,7 +4,7 @@ int main(int argc, char **argv)
 {
     if (argc != 3)
     {
-        std::cout << "Usage: ./ircsercv port password" << std::endl;
+        std::cerr << "Usage: ./ircsercv port password" << '\n';
         return 1;
     }
     try
@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         return 1;
     }
     return 0;
