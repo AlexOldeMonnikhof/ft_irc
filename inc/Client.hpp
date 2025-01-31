@@ -19,6 +19,7 @@ class Client{
         std::string _servername;
         std::string _realname;
     public:
+        Client();
         Client(int socket);
         Client(int fd, const std::string &nick, const std::string &channelName);
         Client(const Client &rhs);

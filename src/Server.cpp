@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "error.hpp"
+#include "Command.hpp"
 #include "headers.hpp"
 
 class Client;

@@ -1,5 +1,7 @@
 #include "Client.hpp"
 
+Client::Client() {}
+
 Client::Client(int socket) : _socket(0), _register(0)
 {
     _socket = socket;

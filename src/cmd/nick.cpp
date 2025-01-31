@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Command.hpp"
 
 void    Server::cmdNICK(int fd, Command& cmd)
 {

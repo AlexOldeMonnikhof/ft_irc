@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Command.hpp"
 
 void    Server::cmdPASS(int fd, Command& cmd)
 {
