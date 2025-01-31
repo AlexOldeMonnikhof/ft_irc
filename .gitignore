@@ -4,3 +4,4 @@ ircserv
 .DS_Store
 .cache/
 compile_commands.json
+.clang-tidy
