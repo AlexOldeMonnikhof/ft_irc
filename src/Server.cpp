@@ -269,7 +269,6 @@ void    Server::handleHexChatRegister(int fd, const std::string &buffer)
         return;
     }
 
-    endpos = buff.find("\r\n", pos);
     std::string user = buff.substr(pos);
     Command User(user);
     cmdUSER(fd, User);
