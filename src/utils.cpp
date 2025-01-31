@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-size_t getChannelIndex(std::vector<Channel>& channels, std::string name)
+size_t getChannelIndex(std::vector<Channel>& channels, const std::string &name)
 {
     for (size_t i = 0; i < channels.size(); i++)
     {
@@ -13,7 +13,7 @@ size_t getChannelIndex(std::vector<Channel>& channels, std::string name)
     return std::string::npos;
 }
 
-bool    Server::channelExist(std::string channel)
+bool    Server::channelExist(const std::string &channel)
 {
     for (size_t i = 0; i < _channels.size(); i++)
     {
@@ -45,7 +45,7 @@ bool    Server::isValidName(std::string nick)
     return true;
 }
 
-bool    Server::nickInUse(int fd, std::string nick)
+bool    Server::nickInUse(int fd, const std::string &nick)
 {
     for (std::vector<pollfd>::iterator iter = _fds.begin() + 1; iter < _fds.end(); iter++)
     {
@@ -64,7 +64,7 @@ bool    Server::nickInUse(int fd, std::string nick)
     return false;
 }
 
-int     Server::getClientFd(std::string nick)
+int     Server::getClientFd(const std::string &nick)
 {
     for (std::map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
     {

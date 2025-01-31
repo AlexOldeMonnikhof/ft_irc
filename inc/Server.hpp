@@ -47,7 +47,7 @@ class Server{
 
         void                        cmdPASS(int fd, Command& cmd);
         bool                        isValidName(std::string nick);
-        bool                        nickInUse(int fd, std::string nick);
+        bool                        nickInUse(int fd, const std::string &nick);
         void                        cmdNICK(int fd, Command& cmd);
         void                        cmdUSER(int fd, Command& cmd);
 
@@ -79,13 +79,13 @@ class Server{
         void                        handleMsgClient(int fd);
         void                        handleHexChatRegister(int fd, const std::string &buffer);
 
-        bool                        channelExist(std::string channel);
-        int                         getClientFd(std::string nick);
+        bool                        channelExist(const std::string &channel);
+        int                         getClientFd(const std::string &nick);
         void                        msgAllClients(const std::string &msg);
 
         void                        mainLoop();
 };
 void                                sendMsg(int fd, const std::string &msg);
 std::vector<std::string>            splitVector(const std::string &s, char delimiter);
-size_t                              getChannelIndex(std::vector<Channel>& channels, std::string name);
+size_t                              getChannelIndex(std::vector<Channel>& channels, const std::string &name);
 #endif
