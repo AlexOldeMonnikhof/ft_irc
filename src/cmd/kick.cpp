@@ -33,21 +33,21 @@ void    Server::cmdKick(int fd, Command& cmd)
 	}
 
 	std::vector<std::string> targets = splitVector(cmd.getCmd(2), ',');
-	for (size_t i = 0; i < targets.size(); i++)
+	for (size_t index = 0; index < targets.size(); index++)
 	{
-		if (!getClientFd(targets[i]))
+		if (!getClientFd(targets[index]))
         {
-            sendMsg(fd, ERR_NOSUCHNICK(_host, targets[i]));
+            sendMsg(fd, ERR_NOSUCHNICK(_host, targets[index]));
             continue;
 		}
 
-		if (!channel.clientInChannel(targets[i]))
+		if (!channel.clientInChannel(targets[index]))
         {
             sendMsg(fd, ERR_USERNOTINCHANNEL(_host, channel.getName()));
 			continue;
 		}
 
-        msgChannel(fd, RPL_KICK(_clients[fd].getNickname(), _clients[fd].getUsername(), _host, channel.getName(), targets[i]), channel.getName(), true);
-        channel.part(getClientFd(targets[i]), targets[i]);
+        msgChannel(fd, RPL_KICK(_clients[fd].getNickname(), _clients[fd].getUsername(), _host, channel.getName(), targets[index]), channel.getName(), true);
+        channel.part(getClientFd(targets[index]), targets[index]);
 	}
 }
