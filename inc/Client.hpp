@@ -24,15 +24,15 @@ class Client{
         int         getRegister() const;
         void        setRegister(int value);
         std::string getNickname() const;
-        void        setNickname(std::string nickname);
+        void        setNickname(const std::string &nickname);
         std::string getUsername() const;
-        void        setUsername(std::string username);
+        void        setUsername(const std::string &username);
         std::string getHostname() const;
-        void        setHostname(std::string hostname);
+        void        setHostname(const std::string &hostname);
         std::string getServername() const;
-        void        setServername(std::string servername);
+        void        setServername(const std::string &servername);
         std::string getRealname() const;
-        void        setRealname(std::string realname);
+        void        setRealname(const std::string &realname);
 };
 
 #endif

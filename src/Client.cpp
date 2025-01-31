@@ -30,7 +30,7 @@ std::string  Client::getNickname() const
     return (_nickname);
 }
 
-void    Client::setNickname(std::string nickname)
+void    Client::setNickname(const std::string &nickname)
 {
     _nickname = nickname;
 }
@@ -40,7 +40,7 @@ std::string  Client::getUsername() const
     return (_username);
 }
 
-void    Client::setUsername(std::string username)
+void    Client::setUsername(const std::string &username)
 {
     _username = username;
 }
@@ -50,7 +50,7 @@ std::string  Client::getHostname() const
     return (_hostname);
 }
 
-void    Client::setHostname(std::string hostname)
+void    Client::setHostname(const std::string &hostname)
 {
     _hostname = hostname;
 }
@@ -60,7 +60,7 @@ std::string  Client::getServername() const
     return (_servername);
 }
 
-void    Client::setServername(std::string servername)
+void    Client::setServername(const std::string &servername)
 {
     _servername = servername;
 }
@@ -70,7 +70,7 @@ std::string  Client::getRealname() const
     return (_realname);
 }
 
-void    Client::setRealname(std::string realname)
+void    Client::setRealname(const std::string &realname)
 {
     _realname = realname;
 }
