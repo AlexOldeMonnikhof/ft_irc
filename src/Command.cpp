@@ -1,9 +1,25 @@
+#include "Command.hpp"
 #include "Server.hpp"
 
 Command::Command(const std::string &str)
 {
     parseCmd(str);
 }
+
+Command::Command(const Command &rhs) :
+    _cmd(rhs._cmd)
+{}
+
+Command &Command::operator=(const Command &rhs)
+{
+    if (this != &rhs) {
+        _cmd = rhs._cmd;
+    }
+
+    return *this;
+}
+
+Command::~Command() {}
 
 void  Command::parseCmd(const std::string &str)
 {

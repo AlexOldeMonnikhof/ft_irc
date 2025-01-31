@@ -14,20 +14,7 @@
 
 class Client;
 class Channel;
-
-class Command{
-    private:
-        std::vector<std::string>    _cmd;
-    public:
-        Command(){};
-        Command(const std::string &str);
-
-        void                        parseCmd(const std::string &str);
-        std::vector<std::string>    getV() const;
-        void                        setCmd(int i, const std::string &arg);
-        std::string                 getCmd(int i) const;
-        size_t                      getSize() const;
-};
+class Command;
 
 class Server{
     private:
