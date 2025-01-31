@@ -1,12 +1,8 @@
 #include "Channel.hpp"
 
-Channel::Channel(int fd, std::string nick, std::string channelName)
+Channel::Channel(int fd, std::string nick, std::string channelName) : _userlimit(50), _inviteOnly(false), _topicOnlyOperators(false), _topic("")
 {
     _clients[nick] = true;
-    _userlimit = 50;
-    _inviteOnly = false;
-    _topicOnlyOperators = false;
-    _topic = "";
     std::cout << nick << " (" << fd <<") created channel " << channelName << '\n';
     setName(channelName);
 }
