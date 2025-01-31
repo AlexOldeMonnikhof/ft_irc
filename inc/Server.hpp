@@ -22,7 +22,7 @@ class Command{
         Command(){};
         Command(const std::string &str);
 
-        void                        parseCmd(std::string str);
+        void                        parseCmd(const std::string &str);
         std::vector<std::string>    getV() const;
         void                        setCmd(int i, const std::string &arg);
         std::string                 getCmd(int i) const;
@@ -69,10 +69,10 @@ class Server{
 
         void                        modeOperator(int fd, Channel& channel, bool adding, Command& cmd);
 
-        void                        privmsgChannel(int fd, Command& cmd, std::string channel);
-        void                        privmsgClient(int fd, Command& cmd, std::string nick);
+        void                        privmsgChannel(int fd, Command& cmd, const std::string &channel);
+        void                        privmsgClient(int fd, Command& cmd, const std::string &nick);
         void                        cmdPrivmsg(int fd, Command& cmd);
-        void                        msgChannel(int fd, std::string msg, std::string channel, bool sendToSender);
+        void                        msgChannel(int fd, const std::string &msg, const std::string &channel, bool sendToSender);
 
         void                        registerClient(int fd, Command& cmd);
         void                        cmdsClient(int fd, Command& cmd);

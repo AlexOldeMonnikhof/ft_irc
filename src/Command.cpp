@@ -5,7 +5,7 @@ Command::Command(const std::string &str)
     parseCmd(str);
 }
 
-void  Command::parseCmd(std::string str)
+void  Command::parseCmd(const std::string &str)
 {
     std::string word = "";
     bool colonFound = false;

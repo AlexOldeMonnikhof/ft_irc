@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-void    Server::msgChannel(int fd, std::string msg, std::string channel, bool sendToSender)
+void    Server::msgChannel(int fd, const std::string &msg, const std::string &channel, bool sendToSender)
 {
     size_t index = getChannelIndex(_channels, channel);
     size_t clientSize = _channels[index].getClientsSize();
@@ -17,7 +17,7 @@ void    Server::msgChannel(int fd, std::string msg, std::string channel, bool se
     }
 }
 
-void    Server::privmsgChannel(int fd, Command& cmd, std::string channel)
+void    Server::privmsgChannel(int fd, Command& cmd, const std::string &channel)
 {
     if (!channelExist(channel))
     {
@@ -41,7 +41,7 @@ void    Server::privmsgChannel(int fd, Command& cmd, std::string channel)
     msgChannel(fd, PRIVMSG_FORMATCH(_clients[fd].getNickname() + op, _clients[fd].getUsername(), _host, channel, cmd.getCmd(2)), channel, false);
 }
 
-void    Server::privmsgClient(int fd, Command& cmd, std::string nick)
+void    Server::privmsgClient(int fd, Command& cmd, const std::string &nick)
 {
     int targetFd = getClientFd(nick);
     if (!targetFd)
