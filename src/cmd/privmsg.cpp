@@ -14,7 +14,6 @@ void    Server::msgChannel(int fd, const std::string &msg, const std::string &ch
             continue;
         }
 
-        std::string nick = _clients[fd].getNickname();
         sendMsg(getClientFd(clients[i]), msg);
     }
 }
