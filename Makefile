@@ -2,8 +2,8 @@ NAME = ircserv
 SRC = 	main.cpp Server.cpp Client.cpp Command.cpp Channel.cpp utils.cpp \
 		invite.cpp join.cpp kick.cpp mode.cpp nick.cpp part.cpp pass.cpp privmsg.cpp topic.cpp user.cpp op.cpp limit.cpp key.cpp quit.cpp Chatbot.cpp
 VPATH = src inc src/cmd
-FLAGS = -Wall -Wextra -Werror -std=c++98 -I inc
-CC = c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I inc
+CXX = c++
 HEADERS = Channel.hpp Chatbot.hpp Client.hpp Command.hpp Server.hpp error.hpp headers.hpp
 
 OBJ_DIR = obj
@@ -12,10 +12,10 @@ OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(FLAGS) $(OBJ) -o $(NAME)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)
 
 $(OBJ_DIR)/%.o: %.cpp $(HEADERS) | $(OBJ_DIR)
-	$(CC) $(FLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
