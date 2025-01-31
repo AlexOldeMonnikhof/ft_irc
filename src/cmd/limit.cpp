@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Channel.hpp"
+#include "Command.hpp"
 
 void    Server::modeUserLimit(int fd, Channel& channel, bool adding, Command& cmd)
 {

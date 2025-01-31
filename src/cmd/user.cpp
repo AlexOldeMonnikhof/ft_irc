@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Command.hpp"
 
 void    Server::cmdUSER(int fd, Command& cmd)
 {

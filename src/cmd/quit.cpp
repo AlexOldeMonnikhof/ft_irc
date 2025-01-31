@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Command.hpp"
 
 void    Server::cmdQuit(int fd, Command& cmd)
 {
@@ -10,4 +11,4 @@ void    Server::cmdQuit(int fd, Command& cmd)
     }
     msgAllClients(RPL_QUIT(_host, _clients[fd].getNickname(), _clients[fd].getUsername(), cmd.getCmd(1)));
     disconnectClient(fd);
-}    
+}

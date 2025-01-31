@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Channel.hpp"
+#include "Command.hpp"
 
 void    Server::cmdTopic(int fd, Command& cmd)
 {
