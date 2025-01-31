@@ -5,6 +5,41 @@
 
 class Client;
 
+Server::Server(const std::string &port, const std::string &password)
+{
+    parseServer(port, password);
+    initServer();
+    std::cout << _host << " listening on port " << _port << " with password " << _password << '\n';
+    mainLoop();
+}
+
+Server::Server(const Server &rhs) :
+    _port(rhs._port),
+    _socket(rhs._socket),
+    _password(rhs._password),
+    _host(rhs._host),
+    _fds(rhs._fds),
+    _clients(rhs._clients),
+    _channels(rhs._channels)
+{}
+
+Server &Server::operator=(const Server &rhs)
+{
+    if (this != &rhs) {
+        _port = rhs._port;
+        _socket = rhs._socket;
+        _password = rhs._password;
+        _host = rhs._host;
+        _fds = rhs._fds;
+        _clients = rhs._clients;
+        _channels = rhs._channels;
+    }
+
+    return *this;
+}
+
+Server::~Server() {}
+
 void    sendMsg(int fd, const std::string &msg)
 {
     send(fd, msg.c_str(), msg.length(), 0);
@@ -297,12 +332,4 @@ void    Server::mainLoop()
             }
         }
     }
-}
-
-Server::Server(const std::string &port, const std::string &password)
-{
-    parseServer(port, password);
-    initServer();
-    std::cout << _host << " listening on port " << _port << " with password " << _password << '\n';
-    mainLoop();
 }

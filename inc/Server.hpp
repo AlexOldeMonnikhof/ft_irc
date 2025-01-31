@@ -40,6 +40,11 @@ class Server{
         std::vector<Channel>        _channels;
     public:
         Server(const std::string &port, const std::string &password);
+        Server(const Server &rhs);
+        Server &operator=(const Server &rhs);
+        ~Server();
+
+    public:
         void                        parseServer(const std::string &port, const std::string &password);
         void                        initServer();
         void                        addClient();
