@@ -20,9 +20,15 @@ void    Server::parseServer(std::string port, std::string password)
 {
     std::stringstream s(port);
     if (!(s >> _port) || _port < 1024 || _port > 6553)
+    {
         throw std::runtime_error("Invalid port");
+    }
+
     if (!password.length())
+    {
         throw std::runtime_error("Invalid password");
+    }
+
     _password = password;
     _host = "IRCServer";
 }
@@ -37,15 +43,22 @@ void    Server::initServer()
     {
         throw std::runtime_error("Failed to create socket");
     }
+
 	fcntl(_socket, F_SETFL, O_NONBLOCK);
 	setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &options, sizeof(int));
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(_port);
 	if (::bind(_socket, (struct sockaddr *)&address, sizeof(address)) < 0)
+    {
 		throw std::runtime_error("Failed to bind socket");
+    }
+
 	if (listen(_socket, SOMAXCONN) < 0)
+    {
 		throw std::runtime_error("Failed to listen on socket");
+    }
+
 	_fds.push_back((pollfd){_socket, POLLIN, 0});
 }
 
@@ -53,7 +66,10 @@ void    Server::addClient()
 {
     int newSocket = accept(_socket, NULL, NULL);
     if (newSocket < 0)
+    {
         throw std::runtime_error("Failed to accept new client");
+    }
+
     fcntl(newSocket, F_SETFL, O_NONBLOCK);
     _fds.push_back((pollfd){newSocket, POLLIN, 0});
     _clients[newSocket] = Client(newSocket);
@@ -70,28 +86,28 @@ void    Server::disconnectClient(int fd)
             break;
         }
     }
+
     _clients.erase(fd);
     close(fd);
 }
 
-
 void    Server::registerClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS")
+    {
         cmdPASS(fd, cmd);
-    else if (!(_clients[fd].getRegister() & 0b100))
+    } else if (!(_clients[fd].getRegister() & 0b100))
     {
         sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
-    }
-    else if (cmd.getCmd(0) == "NICK")
+    } else if (cmd.getCmd(0) == "NICK")
+    {
         cmdNICK(fd, cmd);
-    else if (!(_clients[fd].getRegister() & 0b10))
+    } else if (!(_clients[fd].getRegister() & 0b10))
     {
         sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
-    }
-    else if (cmd.getCmd(0) == "USER")
+    } else if (cmd.getCmd(0) == "USER")
     {
         cmdUSER(fd, cmd);
         if (_clients[fd].getRegister() == 7)
@@ -110,7 +126,10 @@ std::vector<std::string> splitVector(const std::string &s, char delimiter)
     std::stringstream ss(s);
     std::string token;
     while (getline(ss, token, delimiter))
+    {
         tokens.push_back(token);
+    }
+
     return tokens;
 }
 
@@ -119,41 +138,56 @@ void    Server::cmdsClient(int fd, Command& cmd)
     if (cmd.getCmd(0) == "PASS" || cmd.getCmd(0) == "NICK" || cmd.getCmd(0) == "USER")
     {
         if (_clients[fd].getRegister() != 7)
+        {
             registerClient(fd, cmd);
-        else
+        } else
+        {
             sendMsg(fd, ERR_ALREADYREGISTERED(_clients[fd].getNickname(), _host));
+        }
         return;
-    }
-    else if (_clients[fd].getRegister() != 7)
+    } else if (_clients[fd].getRegister() != 7)
     {
         sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
     }
-    if (cmd.getCmd(0) == "JOIN")
-        cmdJoin(fd, cmd);
-    else if (cmd.getCmd(0) == "PART")
-        cmdPart(fd, cmd);
-    else if (cmd.getCmd(0) == "PRIVMSG")
-        cmdPrivmsg(fd, cmd);
-    else if (cmd.getCmd(0) == "MODE")
-        cmdMode(fd, cmd);
-    else if (cmd.getCmd(0) == "INVITE")
-        cmdInvite(fd, cmd);
-    else if (cmd.getCmd(0) == "TOPIC")
-        cmdTopic(fd, cmd);
-    else if (cmd.getCmd(0) == "KICK")
-        cmdKick(fd, cmd);
-    else if (cmd.getCmd(0) == "QUIT")
-        cmdQuit(fd, cmd);
-    else
-        sendMsg(fd, ERR_UNKNOWNCOMMAND(_host, _clients[fd].getNickname(), cmd.getCmd(0)));
 
+    if (cmd.getCmd(0) == "JOIN")
+    {
+        cmdJoin(fd, cmd);
+    } else if (cmd.getCmd(0) == "PART")
+    {
+        cmdPart(fd, cmd);
+    } else if (cmd.getCmd(0) == "PRIVMSG")
+    {
+        cmdPrivmsg(fd, cmd);
+    } else if (cmd.getCmd(0) == "MODE")
+    {
+        cmdMode(fd, cmd);
+    } else if (cmd.getCmd(0) == "INVITE")
+    {
+        cmdInvite(fd, cmd);
+    } else if (cmd.getCmd(0) == "TOPIC")
+    {
+        cmdTopic(fd, cmd);
+    } else if (cmd.getCmd(0) == "KICK")
+    {
+        cmdKick(fd, cmd);
+    } else if (cmd.getCmd(0) == "QUIT")
+    {
+        cmdQuit(fd, cmd);
+    } else
+    {
+        sendMsg(fd, ERR_UNKNOWNCOMMAND(_host, _clients[fd].getNickname(), cmd.getCmd(0)));
+    }
 }
 
 bool    checkIfHexChat(std::string str)
 {
     if (str.find("CAP") != std::string::npos)
+    {
         return true;
+    }
+
     return false;
 }
 
@@ -164,7 +198,10 @@ void    Server::handleHexChatRegister(int fd, std::string buffer)
     std::size_t endpos;
     pos = buff.find("PASS");
     if (pos == std::string::npos)
+    {
         return;
+    }
+
     endpos = buff.find("\r\n", pos);
     std::string pass = buff.substr(pos, endpos - pos);
     Command Pass(pass);
@@ -172,7 +209,10 @@ void    Server::handleHexChatRegister(int fd, std::string buffer)
     buff = buffer;
     pos = buff.find("NICK");
     if (pos == std::string::npos)
+    {
         return;
+    }
+
     endpos = buff.find("\r\n", pos);
     std::string nick = buff.substr(pos, endpos - pos);
     Command Nick(nick);
@@ -180,7 +220,10 @@ void    Server::handleHexChatRegister(int fd, std::string buffer)
     buff = buffer;
     pos = buff.find("USER");
     if (pos == std::string::npos)
+    {
         return;
+    }
+
     endpos = buff.find("\r\n", pos);
     std::string user = buff.substr(pos);
     Command User(user);
@@ -207,14 +250,16 @@ void Server::handleMsgClient(int fd)
         disconnectClient(fd);
         return;
     }
+
     partial[fd].append(buffer, bytesRecv);
     while ((pos = partial[fd].find('\n')) != std::string::npos)
     {
         std::string line = partial[fd].substr(0, pos + 1);
         partial[fd].erase(0, pos + 1);
         if (checkIfHexChat(line))
+        {
             handleHexChatRegister(fd, line);
-        else
+        } else
         {
             Command cmd(line);
             if (!cmd.getV().empty())
@@ -228,20 +273,25 @@ void    Server::mainLoop()
     while (true)
     {
         if (poll(_fds.begin().base(), _fds.size(), WAIT_FOREVER) < 0)
+        {
             throw std::runtime_error("Error: poll failed");
+        }
         for (size_t i = 0; i < _fds.size(); i++)
         {
             if (_fds[i].revents == 0)
+            {
                 continue;
+            }
             if ((_fds[i].revents & POLLIN) == POLLIN)
             {
                 if (_fds[i].fd == _socket)
                 {
-                   std::cout << "New client connected" << std::endl;
+                   std::cout << "New client connected" << '\n';
                     addClient();
-                }
-                else
+                } else
+                {
                     handleMsgClient(_fds[i].fd);
+                }
             }
         }
     }
@@ -251,6 +301,6 @@ Server::Server(std::string port, std::string password)
 {
     parseServer(port, password);
     initServer();
-    std::cout << _host << " listening on port " << _port << " with password " << _password << std::endl;
+    std::cout << _host << " listening on port " << _port << " with password " << _password << '\n';
     mainLoop();
 }
