@@ -5,18 +5,18 @@
 
 class Client;
 
-void    sendMsg(int fd, std::string msg)
+void    sendMsg(int fd, const std::string &msg)
 {
     send(fd, msg.c_str(), msg.length(), 0);
 }
 
-void    Server::msgAllClients(std::string msg)
+void    Server::msgAllClients(const std::string &msg)
 {
     for (std::map<int, Client>::iterator iter = _clients.begin(); iter != _clients.end(); iter++)
         sendMsg(iter->first, msg);
 }
 
-void    Server::parseServer(std::string port, std::string password)
+void    Server::parseServer(const std::string &port, const std::string &password)
 {
     std::stringstream s(port);
     if (!(s >> _port) || _port < 1024 || _port > 6553)
@@ -77,7 +77,7 @@ void    Server::addClient()
 
 void    Server::disconnectClient(int fd)
 {
-    std::cout << "Client disconnected. fd = " << fd << std::endl;
+    std::cout << "Client disconnected. fd = " << fd << '\n';
     for (std::vector<pollfd>::iterator it = _fds.begin(); it != _fds.end(); ++it)
     {
         if (it->fd == fd)
@@ -181,7 +181,7 @@ void    Server::cmdsClient(int fd, Command& cmd)
     }
 }
 
-bool    checkIfHexChat(std::string str)
+bool    checkIfHexChat(const std::string &str)
 {
     if (str.find("CAP") != std::string::npos)
     {
@@ -191,7 +191,7 @@ bool    checkIfHexChat(std::string str)
     return false;
 }
 
-void    Server::handleHexChatRegister(int fd, std::string buffer)
+void    Server::handleHexChatRegister(int fd, const std::string &buffer)
 {
     std::string buff = buffer;
     std::size_t pos;
@@ -297,7 +297,7 @@ void    Server::mainLoop()
     }
 }
 
-Server::Server(std::string port, std::string password)
+Server::Server(const std::string &port, const std::string &password)
 {
     parseServer(port, password);
     initServer();

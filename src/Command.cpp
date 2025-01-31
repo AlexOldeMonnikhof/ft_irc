@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Command::Command(std::string str)
+Command::Command(const std::string &str)
 {
     parseCmd(str);
 }
@@ -59,7 +59,7 @@ std::string  Command::getCmd(int i) const
     return _cmd[i];
 }
 
-void    Command::setCmd(int i, std::string arg)
+void    Command::setCmd(int i, const std::string &arg)
 {
     _cmd[i] = arg;
 }

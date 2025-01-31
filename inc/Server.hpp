@@ -20,11 +20,11 @@ class Command{
         std::vector<std::string>    _cmd;
     public:
         Command(){};
-        Command(std::string str);
+        Command(const std::string &str);
 
         void                        parseCmd(std::string str);
         std::vector<std::string>    getV() const;
-        void                        setCmd(int i, std::string arg);
+        void                        setCmd(int i, const std::string &arg);
         std::string                 getCmd(int i) const;
         size_t                      getSize() const;
 };
@@ -39,8 +39,8 @@ class Server{
         std::map<int, Client>       _clients;
         std::vector<Channel>        _channels;
     public:
-        Server(std::string port, std::string password);
-        void                        parseServer(std::string port, std::string password);
+        Server(const std::string &port, const std::string &password);
+        void                        parseServer(const std::string &port, const std::string &password);
         void                        initServer();
         void                        addClient();
         void                        disconnectClient(int fd);
@@ -77,15 +77,15 @@ class Server{
         void                        registerClient(int fd, Command& cmd);
         void                        cmdsClient(int fd, Command& cmd);
         void                        handleMsgClient(int fd);
-        void                        handleHexChatRegister(int fd, std::string buffer);
+        void                        handleHexChatRegister(int fd, const std::string &buffer);
 
         bool                        channelExist(std::string channel);
         int                         getClientFd(std::string nick);
-        void                        msgAllClients(std::string msg);
+        void                        msgAllClients(const std::string &msg);
 
         void                        mainLoop();
 };
-void                                sendMsg(int fd, std::string msg);
+void                                sendMsg(int fd, const std::string &msg);
 std::vector<std::string>            splitVector(const std::string &s, char delimiter);
 size_t                              getChannelIndex(std::vector<Channel>& channels, std::string name);
 #endif
