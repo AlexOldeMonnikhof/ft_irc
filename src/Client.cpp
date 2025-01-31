@@ -1,10 +1,6 @@
 #include "Client.hpp"
 
-Client::Client(int socket)
-{
-    _socket = socket;
-    _register = 0;
-}
+Client::Client(int socket) : _socket(socket), _register(0) {}
 
 int Client::getRegister() const
 {
