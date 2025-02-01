@@ -1,0 +1,2 @@
+als je ctrl+c doet hebben we fd's doe open staan, en reachable voor mem
+valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --track-origins=yes --read-var-info=yes --track-fds=yes --trace-children=yes --log-file=server.log ./ircserv 1234 test
