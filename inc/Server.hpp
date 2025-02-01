@@ -9,6 +9,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Command.hpp"
+#include "Chatbot.hpp"
 
 #define WAIT_FOREVER -1
 
@@ -25,6 +26,7 @@ class Server{
         std::vector<pollfd>         _fds;
         std::map<int, Client>       _clients;
         std::vector<Channel>        _channels;
+        Chatbot                     _chatbot;
     public:
         Server(const std::string &port, const std::string &password);
         Server(const Server &rhs);

@@ -12,7 +12,7 @@
 
 static bool    checkIfHexChat(const std::string &str);
 
-Server::Server(const std::string &port, const std::string &password)
+Server::Server(const std::string &port, const std::string &password) : _chatbot("IRCBOT")
 {
     parseServer(port, password);
     initServer();
@@ -27,7 +27,8 @@ Server::Server(const Server &rhs) :
     _host(rhs._host),
     _fds(rhs._fds),
     _clients(rhs._clients),
-    _channels(rhs._channels)
+    _channels(rhs._channels),
+    _chatbot(rhs._chatbot)
 {}
 
 Server &Server::operator=(const Server &rhs)
@@ -40,6 +41,7 @@ Server &Server::operator=(const Server &rhs)
         _fds = rhs._fds;
         _clients = rhs._clients;
         _channels = rhs._channels;
+        _chatbot = rhs._chatbot;
     }
 
     return *this;
@@ -293,8 +295,9 @@ void Server::handleMsgClient(int fd)
         } else
         {
             Command cmd(line);
-            if (!cmd.getV().empty())
+            if (!cmd.getV().empty()) {
                 cmdsClient(fd, cmd);
+            }
         }
     }
 }
@@ -307,17 +310,19 @@ void    Server::mainLoop()
         {
             throw std::runtime_error("Error: poll failed");
         }
+
         for (size_t i = 0; i < _fds.size(); i++)
         {
             if (_fds[i].revents == 0)
             {
                 continue;
             }
+
             if ((_fds[i].revents & POLLIN) == POLLIN)
             {
                 if (_fds[i].fd == _socket)
                 {
-                   std::cout << "New client connected" << '\n';
+                    std::cout << "New client connected" << '\n';
                     addClient();
                 } else
                 {
