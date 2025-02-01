@@ -1,11 +1,8 @@
 #include "Client.hpp"
 
-Client::Client() {}
+Client::Client() : _socket(0), _register(0) {}
 
-Client::Client(int socket) : _socket(0), _register(0)
-{
-    _socket = socket;
-}
+Client::Client(int socket) : _socket(socket), _register(0) {}
 
 Client::Client(const Client &rhs) :
     _socket(rhs._socket),
