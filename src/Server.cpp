@@ -151,7 +151,7 @@ void    Server::registerClient(int fd, Command& cmd)
     } else if (cmd.getCmd(0) == "USER")
     {
         cmdUSER(fd, cmd);
-        if (_clients[fd].getRegister() == 7)
+        if (_clients[fd].getRegister() == VALID_REGISTER)
         {
 		    sendMsg(fd, RPL_WELCOME(_clients[fd].getNickname(), _host));
 		    sendMsg(fd, RPL_YOURHOST(_clients[fd].getNickname(), _host));
@@ -178,7 +178,7 @@ void    Server::cmdsClient(int fd, Command& cmd)
 {
     if (cmd.getCmd(0) == "PASS" || cmd.getCmd(0) == "NICK" || cmd.getCmd(0) == "USER")
     {
-        if (_clients[fd].getRegister() != 7)
+        if (_clients[fd].getRegister() != VALID_REGISTER)
         {
             registerClient(fd, cmd);
         } else
@@ -186,7 +186,7 @@ void    Server::cmdsClient(int fd, Command& cmd)
             sendMsg(fd, ERR_ALREADYREGISTERED(_clients[fd].getNickname(), _host));
         }
         return;
-    } else if (_clients[fd].getRegister() != 7)
+    } else if (_clients[fd].getRegister() != VALID_REGISTER)
     {
         sendMsg(fd, ERR_NOTREGISTERED(_clients[fd].getNickname(), _host));
         return;
@@ -235,15 +235,13 @@ bool    checkIfHexChat(const std::string &str)
 void    Server::handleHexChatRegister(int fd, const std::string &buffer)
 {
     std::string buff = buffer;
-    std::size_t pos;
-    std::size_t endpos;
-    pos = buff.find("PASS");
+    std::size_t pos = buff.find("PASS");
     if (pos == std::string::npos)
     {
         return;
     }
 
-    endpos = buff.find("\r\n", pos);
+    std::size_t endpos = buff.find("\r\n", pos);
     std::string pass = buff.substr(pos, endpos - pos);
     Command Pass(pass);
     cmdPASS(fd, Pass);
@@ -268,7 +266,7 @@ void    Server::handleHexChatRegister(int fd, const std::string &buffer)
     std::string user = buff.substr(pos);
     Command User(user);
     cmdUSER(fd, User);
-    if (_clients[fd].getRegister() == 7)
+    if (_clients[fd].getRegister() == VALID_REGISTER)
     {
         sendMsg(fd, RPL_WELCOME(_clients[fd].getNickname(), _host));
         sendMsg(fd, RPL_YOURHOST(_clients[fd].getNickname(), _host));
@@ -280,7 +278,6 @@ void    Server::handleHexChatRegister(int fd, const std::string &buffer)
 void Server::handleMsgClient(int fd)
 {
     static std::map<int, std::string> partial;
-    size_t pos;
     char buffer[BUFFER_LENGTH + 1];
     memset(buffer, 0, sizeof(buffer));
     ssize_t bytesRecv = recv(fd, buffer, BUFFER_LENGTH, 0);
@@ -291,6 +288,7 @@ void Server::handleMsgClient(int fd)
         return;
     }
 
+    size_t pos = 0;
     partial[fd].append(buffer, bytesRecv);
     while ((pos = partial[fd].find('\n')) != std::string::npos)
     {

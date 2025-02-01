@@ -14,6 +14,8 @@
 
 #define BUFFER_LENGTH 2048
 
+#define VALID_REGISTER 7
+
 class Server{
     private:
         int                         _port;
