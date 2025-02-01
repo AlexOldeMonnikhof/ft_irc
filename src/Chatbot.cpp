@@ -14,6 +14,8 @@ Chatbot &Chatbot::operator=(const Chatbot &rhs)
     return *this;
 }
 
+Chatbot::~Chatbot() {}
+
 std::string Chatbot::getRespons()
 {
     return "Sorry i'm still learning so i can not help you on the moment";

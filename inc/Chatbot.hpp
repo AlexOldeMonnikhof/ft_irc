@@ -7,6 +7,7 @@ class Chatbot {
         Chatbot();
         Chatbot(const Chatbot &rhs);
         Chatbot &operator=(const Chatbot &rhs);
+        ~Chatbot();
     public:
         std::string getRespons();
 };
