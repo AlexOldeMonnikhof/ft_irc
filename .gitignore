@@ -5,3 +5,5 @@ ircserv
 .cache/
 compile_commands.json
 .clang-tidy
+infer-out
+obj/
