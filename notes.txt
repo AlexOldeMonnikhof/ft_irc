@@ -1,2 +1,48 @@
 als je ctrl+c doet hebben we fd's doe open staan, en reachable voor mem
 valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --track-origins=yes --read-var-info=yes --track-fds=yes --trace-children=yes --log-file=server.log ./ircserv 1234 test
+
+
+als ik 2 keer Hexchat open krijg ik het volgende:
+```
+ Checksum plugin loaded
+ Sysinfo plugin loaded
+ Lua version 1.3/5.4 loaded.
+ Perl interface loaded
+ FiSHLiM plugin loaded
+ Python interface loaded
+* Looking up localhost
+* Connecting to localhost (127.0.0.1:1234)
+* Connected. Now logging in.
+* Nickname is already in use. Retrying with luuk_...
+* You have not registered
+* Erroneus is erroneous. Retrying with luuk__...
+* Nickname is erroneous or already in use. Use /NICK to try another.
+```
+
+run:
+```
+/NICK test
+```
+
+zie niks in Hexchat en op de server
+dan run:
+```
+asdasdas
+```
+
+Hexchat:
+```
+Niet in een kanaal. Probeer /join #<kanaal>
+```
+
+run:
+```
+/join #test
+```
+
+Hexchat:
+```
+* You have not registered
+```
+
+
