@@ -18,6 +18,6 @@ void    Server::cmdUSER(int fd, Command& cmd)
     _clients[fd].setRegister(USERNAME);
     if (_clients[fd].getRegister() == VALID_REGISTER)
     {
-        std::cout << "Client is now registered" << '\n';
+        std::cout << "Client is now registered. fd = " << fd << '\n';
     }
 }
