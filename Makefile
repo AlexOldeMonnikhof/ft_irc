@@ -3,7 +3,7 @@ NAME := ircserv
 VPATH := src inc src/cmd
 SRC := Channel.cpp Chatbot.cpp Client.cpp Command.cpp main.cpp Server.cpp utils.cpp \
 	   invite.cpp join.cpp key.cpp kick.cpp limit.cpp mode.cpp nick.cpp op.cpp part.cpp pass.cpp privmsg.cpp quit.cpp topic.cpp user.cpp
-HEADERS := Channel.hpp Chatbot.hpp Client.hpp Command.hpp error.hpp headers.hpp Server.hpp
+HEADERS := Channel.hpp Chatbot.hpp Client.hpp Command.hpp error.hpp Server.hpp
 
 CXX := c++
 CXXFLAGS := -Wall -Wextra -Werror -std=c++98 -I inc -g3
