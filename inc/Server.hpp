@@ -1,7 +1,11 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <map>
 #include <poll.h>
+#include <string>
+#include <vector>
+
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Command.hpp"
