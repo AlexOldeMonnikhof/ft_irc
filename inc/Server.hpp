@@ -14,8 +14,6 @@
 
 #define BUFFER_LENGTH 2048
 
-#define WHITE_SPACE "\f\n\r\t\v "
-
 class Server{
     private:
         int                         _port;

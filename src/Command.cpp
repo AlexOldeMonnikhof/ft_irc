@@ -1,5 +1,4 @@
 #include "Command.hpp"
-#include "Server.hpp"
 
 Command::Command(const std::string &str)
 {

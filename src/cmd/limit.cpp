@@ -1,8 +1,6 @@
 #include <cstdlib>
 
 #include "Server.hpp"
-#include "Channel.hpp"
-#include "Command.hpp"
 #include "error.hpp"
 
 void    Server::modeUserLimit(int fd, Channel& channel, bool adding, Command& cmd)

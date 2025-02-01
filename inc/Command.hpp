@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#define WHITE_SPACE "\f\n\r\t\v "
+
 class Command{
     private:
         std::vector<std::string>    _cmd;

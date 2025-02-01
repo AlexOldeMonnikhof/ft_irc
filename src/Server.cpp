@@ -7,9 +7,7 @@
 #include <unistd.h>
 
 #include "Server.hpp"
-#include "Client.hpp"
 #include "error.hpp"
-#include "Command.hpp"
 
 Server::Server(const std::string &port, const std::string &password)
 {

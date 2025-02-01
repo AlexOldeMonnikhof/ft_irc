@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "Command.hpp"
 #include "error.hpp"
 
 void    Server::msgChannel(int fd, const std::string &msg, const std::string &channel, bool sendToSender)

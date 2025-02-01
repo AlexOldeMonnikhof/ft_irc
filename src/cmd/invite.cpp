@@ -1,8 +1,6 @@
 #include <iostream>
 
 #include "Server.hpp"
-#include "Channel.hpp"
-#include "Command.hpp"
 #include "error.hpp"
 
 void    Server::cmdInvite(int fd, Command& cmd)

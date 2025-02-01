@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "Command.hpp"
 #include "error.hpp"
 
 void    Server::cmdQuit(int fd, Command& cmd)

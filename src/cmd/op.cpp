@@ -1,6 +1,4 @@
 #include "Server.hpp"
-#include "Channel.hpp"
-#include "Command.hpp"
 #include "error.hpp"
 
 void    Server::modeOperator(int fd, Channel& channel, bool adding, Command& cmd)
