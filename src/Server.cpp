@@ -9,6 +9,9 @@
 #include "Server.hpp"
 #include "error.hpp"
 
+
+static bool    checkIfHexChat(const std::string &str);
+
 Server::Server(const std::string &port, const std::string &password)
 {
     parseServer(port, password);
@@ -222,16 +225,6 @@ void    Server::cmdsClient(int fd, Command& cmd)
     }
 }
 
-bool    checkIfHexChat(const std::string &str)
-{
-    if (str.find("CAP") != std::string::npos)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 void    Server::handleHexChatRegister(int fd, const std::string &buffer)
 {
     std::string buff = buffer;
@@ -333,4 +326,14 @@ void    Server::mainLoop()
             }
         }
     }
+}
+
+static bool    checkIfHexChat(const std::string &str)
+{
+    if (str.find("CAP") != std::string::npos)
+    {
+        return true;
+    }
+
+    return false;
 }
