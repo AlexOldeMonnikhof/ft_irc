@@ -4,16 +4,13 @@
 #include <poll.h>
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Command.hpp"
 
 #define WAIT_FOREVER -1
 
 #define BUFFER_LENGTH 2048
 
 #define WHITE_SPACE "\f\n\r\t\v "
-
-class Client;
-class Channel;
-class Command;
 
 class Server{
     private:
