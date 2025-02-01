@@ -76,7 +76,7 @@ void    Server::parseServer(const std::string &port, const std::string &password
 
 void    Server::initServer()
 {
-    struct sockaddr_in address;
+    struct sockaddr_in address = {};
     int options = 1;
 
     _socket = socket(AF_INET, SOCK_STREAM, 0);
