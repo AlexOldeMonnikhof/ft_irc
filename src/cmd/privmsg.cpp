@@ -68,6 +68,11 @@ void    Server::cmdPrivmsg(int fd, Command& cmd)
         if (targets[i][0] == '#')
         {
             privmsgChannel(fd, cmd, targets[i]);
+        } else if (targets[i] == _chatbot.getNickname())
+        {
+            const std::string sender = _clients[fd].getNickname();
+            cmd.setCmd(2, _chatbot.getRespons(sender, cmd.getCmd(2)));
+            privmsgClient(fd, cmd, sender);
         } else
         {
             privmsgClient(fd, cmd, targets[i]);
