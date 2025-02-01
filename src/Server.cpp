@@ -11,8 +11,6 @@
 #include "error.hpp"
 #include "Command.hpp"
 
-class Client;
-
 Server::Server(const std::string &port, const std::string &password)
 {
     parseServer(port, password);
