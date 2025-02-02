@@ -27,10 +27,13 @@ class Server{
         std::map<int, Client>       _clients;
         std::vector<Channel>        _channels;
         Chatbot                     _chatbot;
+
     public:
         Server(const std::string &port, const std::string &password);
+
         Server(const Server &rhs);
         Server &operator=(const Server &rhs);
+
         ~Server();
 
     public:
@@ -79,6 +82,7 @@ class Server{
 
         void                        mainLoop();
 };
+
 void                                sendMsg(int fd, const std::string &msg);
 std::vector<std::string>            splitVector(const std::string &s, char delimiter);
 size_t                              getChannelIndex(std::vector<Channel>& channels, const std::string &name);
