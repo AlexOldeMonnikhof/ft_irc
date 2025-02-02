@@ -38,19 +38,21 @@ std::string Chatbot::getRespons(const std::string &sender, const std::string &me
         return "";
     }
 
+    if (message.find("hello") != std::string::npos || message.find("hi") != std::string::npos)
+    {
+        return "Hello " + sender + "! How can I help you today?";
+    }
+
     if (message.length() > 0 && message[0] == '!')
     {
         std::string command = message.substr(1);
+        rstrip(command);
+
         std::map<std::string, std::string>::const_iterator it = _commands.find(command);
         if (it != _commands.end())
         {
             return it->second;
         }
-    }
-
-    if (message.find("hello") != std::string::npos || message.find("hi") != std::string::npos)
-    {
-        return "Hello " + sender + "! How can I help you today?";
     }
 
     return "Sorry i'm still in mine learning fase, and like my mentor i'm a slow learner, please have some patcience with me";
@@ -59,13 +61,18 @@ std::string Chatbot::getRespons(const std::string &sender, const std::string &me
 void Chatbot::initCommands()
 {
     _commands["help"] = "Available commands: !help, !time, !about, !rules";
-    _commands["time"] = "Current server time: " + getCurrentTime();
+    _commands["time"] = "Current server datetime: " + dt();
     _commands["about"] = "I'm a friendly IRC bot here to help!";
     _commands["rules"] = "1. Be respectful 2. No spam 3. Have fun!";
 }
 
-std::string Chatbot::getCurrentTime()
+std::string Chatbot::dt()
 {
     time_t now = time(0);
     return std::string(ctime(&now));
+}
+
+void Chatbot::rstrip(std::string &s)
+{
+    s.erase(s.find_last_not_of(" \t\r\n") + 1);
 }

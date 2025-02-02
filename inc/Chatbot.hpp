@@ -11,7 +11,8 @@ class Chatbot {
 
     private:
         void initCommands();
-        std::string getCurrentTime();
+        std::string dt();
+        void rstrip(std::string &s);
 
     public:
         Chatbot(const std::string &nickname);
